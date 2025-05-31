@@ -5,7 +5,11 @@ from django.http import JsonResponse # Add this import
 from geopy.geocoders import Nominatim # Ensure this import is at the top
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from .models import Users
+from .models import Users, Report, Agency, IssueType, RoadType
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import uuid
+from datetime import datetime
 
 def home(request):
     """Home page view"""
@@ -156,3 +160,75 @@ def logout_view(request):
     request.session.flush()
     messages.success(request, 'You have been successfully logged out.')
     return redirect('frontend:login')
+
+def submit_report(request):
+    if request.method == 'POST':
+        try:
+            # Generate tracking code
+            tracking_code = f"REP-{datetime.now().strftime('%Y%m%d')}-{str(uuid.uuid4())[:8]}"
+            
+            # Handle file upload
+            photo = request.FILES.get('photo')
+            if not photo:
+                return JsonResponse({'error': 'Photo is required'}, status=400)
+
+            try:
+                # Save the file
+                path = default_storage.save(f'reports/{tracking_code}_{photo.name}', ContentFile(photo.read()))
+                photo_url = default_storage.url(path)
+            except Exception as e:
+                print(f"Error saving photo: {str(e)}")
+                return JsonResponse({'error': f'Error saving photo: {str(e)}'}, status=400)
+
+            # Get required data
+            try:
+                default_agency = Agency.objects.select_for_update().first()
+                if not default_agency:
+                    return JsonResponse({'error': 'No agency available'}, status=400)
+
+                issue_type = IssueType.objects.select_for_update().get(name=request.POST.get('issue_type'))
+                road_type = RoadType.objects.select_for_update().get(name='Asphalt')
+            except (Agency.DoesNotExist, IssueType.DoesNotExist, RoadType.DoesNotExist) as e:
+                print(f"Database object not found: {str(e)}")
+                return JsonResponse({'error': 'Required data not found in database'}, status=400)
+            except Exception as e:
+                print(f"Error accessing database: {str(e)}")
+                return JsonResponse({'error': 'Database error'}, status=500)
+
+            # Create the report
+            try:
+                report = Report.objects.create(
+                    tracking_code=tracking_code,
+                    description=request.POST.get('description'),
+                    photo_url=photo_url,
+                    latitude=request.POST.get('latitude'),
+                    longitude=request.POST.get('longitude'),
+                    address=request.POST.get('address'),
+                    road_name=request.POST.get('road_name'),
+                    assigned_agency=default_agency,
+                    status_report_status='Pending',
+                    citizen_name=request.POST.get('full_name'),
+                    citizen_email=request.POST.get('email'),
+                    issue_type=issue_type,
+                    road_type=road_type
+                )
+            except Exception as e:
+                print(f"Error creating report: {str(e)}")
+                # Clean up the uploaded file if report creation fails
+                try:
+                    default_storage.delete(path)
+                except:
+                    pass
+                return JsonResponse({'error': f'Error creating report: {str(e)}'}, status=400)
+
+            return JsonResponse({
+                'success': True,
+                'tracking_code': tracking_code,
+                'message': 'Report submitted successfully'
+            })
+
+        except Exception as e:
+            print(f"Unexpected error in submit_report: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Method not allowed'}, status=405)

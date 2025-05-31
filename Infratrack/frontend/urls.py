@@ -17,5 +17,6 @@ urlpatterns = [
     path('admin/', views.admin_interface, name='admin'),
     path('404/', views.not_found, name='404'),
     path('geocode/', views.geocode, name='geocode'),
-    path('reverse-geocode/', views.reverse_geocode, name='reverse_geocode'), # New URL pattern
+    path('reverse-geocode/', views.reverse_geocode, name='reverse_geocode'),
+    path('submit-report/', views.submit_report, name='submit_report'),
 ]
