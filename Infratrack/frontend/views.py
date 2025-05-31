@@ -56,18 +56,35 @@ def dashboard(request):
     # Get user data
     user = Users.objects.get(id=request.session['user_id'])
     
-    # Get filter parameters
+    # Get filter parameters with default values
     issue_type = request.GET.get('issue_type', 'All Types')
     status = request.GET.get('status', 'All Status')
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
     
     # Get reports for the user's agency
     reports = Report.objects.filter(assigned_agency=user.agency).order_by('-created_at')
     
     # Apply filters if specified
-    if issue_type != 'All Types':
+    if issue_type and issue_type != 'All Types':
         reports = reports.filter(issue_type__name=issue_type)
-    if status != 'All Status':
+    
+    if status and status != 'All Status':
         reports = reports.filter(status_report_status=status)
+    
+    if start_date:
+        try:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d')
+            reports = reports.filter(created_at__gte=start_date)
+        except ValueError:
+            pass
+    
+    if end_date:
+        try:
+            end_date = datetime.strptime(end_date, '%Y-%m-%d')
+            reports = reports.filter(created_at__lte=end_date)
+        except ValueError:
+            pass
     
     # Get all issue types and statuses for the filter dropdowns
     issue_types = IssueType.objects.all()
@@ -80,8 +97,11 @@ def dashboard(request):
         'issue_types': issue_types,
         'statuses': statuses,
         'selected_issue_type': issue_type,
-        'selected_status': status
+        'selected_status': status,
+        'selected_start_date': start_date if isinstance(start_date, str) else start_date.strftime('%Y-%m-%d') if start_date else '',
+        'selected_end_date': end_date if isinstance(end_date, str) else end_date.strftime('%Y-%m-%d') if end_date else ''
     }
+    
     return render(request, 'frontend/dashboard.html', context)
 
 @login_required
