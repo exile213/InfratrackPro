@@ -56,9 +56,31 @@ def dashboard(request):
     # Get user data
     user = Users.objects.get(id=request.session['user_id'])
     
+    # Get filter parameters
+    issue_type = request.GET.get('issue_type', 'All Types')
+    status = request.GET.get('status', 'All Status')
+    
+    # Get reports for the user's agency
+    reports = Report.objects.filter(assigned_agency=user.agency).order_by('-created_at')
+    
+    # Apply filters if specified
+    if issue_type != 'All Types':
+        reports = reports.filter(issue_type__name=issue_type)
+    if status != 'All Status':
+        reports = reports.filter(status_report_status=status)
+    
+    # Get all issue types and statuses for the filter dropdowns
+    issue_types = IssueType.objects.all()
+    statuses = Report.objects.values_list('status_report_status', flat=True).distinct()
+    
     context = {
         'user': user,
-        'role': request.session['role']
+        'role': request.session['role'],
+        'reports': reports,
+        'issue_types': issue_types,
+        'statuses': statuses,
+        'selected_issue_type': issue_type,
+        'selected_status': status
     }
     return render(request, 'frontend/dashboard.html', context)
 
