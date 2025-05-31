@@ -5,7 +5,8 @@ app_name = 'frontend'
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('login/', views.login, name='login'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
     path('register-agency/', views.register_agency, name='register_agency'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('analytics/', views.analytics, name='analytics'),

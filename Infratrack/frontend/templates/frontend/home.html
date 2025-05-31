@@ -59,7 +59,8 @@
             document.getElementById("barangay").value = barangay;
             document.getElementById("street").value = street;
             document.getElementById("province").value = province;
-            document.getElementById("display-street").innerText = data.address.road || data.address.street || "";
+            document.getElementById("display-street").innerText =
+              data.address.road || data.address.street || "";
             document.getElementById("display-barangay").innerText =
               data.address.village ||
               data.address.suburb ||
@@ -129,7 +130,8 @@
               document.getElementById("barangay").value = barangay;
               document.getElementById("street").value = street;
               document.getElementById("province").value = province;
-              document.getElementById("display-street").innerText = data.address.road || data.address.street || "";
+              document.getElementById("display-street").innerText =
+                data.address.road || data.address.street || "";
               document.getElementById("display-barangay").innerText =
                 data.address.village ||
                 data.address.suburb ||
@@ -211,7 +213,8 @@
           document.getElementById("barangay").value = barangay;
           document.getElementById("street").value = street;
           document.getElementById("province").value = province;
-          document.getElementById("display-street").innerText = data.address.road || data.address.street || "";
+          document.getElementById("display-street").innerText =
+            data.address.road || data.address.street || "";
           document.getElementById("display-barangay").innerText =
             data.address.village ||
             data.address.suburb ||
@@ -304,61 +307,131 @@
             <option>Other</option>
           </select>
         </div>
-        <!-- Location -->
+        <!-- Location (Tabbed) -->
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
           <label class="block text-lg font-semibold text-gray-800 mb-3"
             >Location</label
           >
-          <div class="flex flex-col sm:flex-row gap-3 mb-4">
-            <button
-              type="button"
-              onclick="getLocation()"
-              class="inline-flex items-center px-4 py-2 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 transition duration-150 ease-in-out shadow mr-2"
+          <div class="mb-4">
+            <ul class="flex border-b">
+              <li class="mr-1">
+                <a
+                  class="bg-white inline-block py-2 px-4 font-semibold text-blue-600 hover:text-blue-800 cursor-pointer tab-link active"
+                  onclick="showTab('geo')"
+                  >Geocoding</a
+                >
+              </li>
+              <li class="mr-1">
+                <a
+                  class="bg-white inline-block py-2 px-4 font-semibold text-blue-600 hover:text-blue-800 cursor-pointer tab-link"
+                  onclick="showTab('manual')"
+                  >Manual Entry</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div id="geo-tab" class="tab-content">
+            <div class="flex flex-col sm:flex-row gap-3 mb-4">
+              <button
+                type="button"
+                onclick="getLocation()"
+                class="inline-flex items-center px-4 py-2 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 transition duration-150 ease-in-out shadow mr-2"
+              >
+                Use My Location
+              </button>
+              <input
+                id="location"
+                name="location"
+                type="text"
+                class="mt-1 block w-full px-5 py-3 border-2 border-indigo-300 rounded-2xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 sm:text-base"
+                placeholder="Enter location (e.g., Main Street, City)"
+                onkeydown="if(event.keyCode === 13) { event.preventDefault(); searchLocation(); }"
+              />
+            </div>
+            <div
+              class="h-64 rounded-xl overflow-hidden border border-gray-300 shadow-inner"
             >
-              Use My Location
-            </button>
-            <input
-              id="location"
-              name="location"
-              type="text"
-              required
-              class="mt-1 block w-full px-5 py-3 border-2 border-indigo-300 rounded-2xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-500 sm:text-base"
-              placeholder="Enter location (e.g., Main Street, City)"
-              onkeydown="if(event.keyCode === 13) { event.preventDefault(); searchLocation(); }"
-            />
+              <div id="report-map" class="w-full h-full"></div>
+            </div>
+            <!-- Hidden Location Inputs and Address Display -->
+            <input type="hidden" name="latitude" id="latitude" />
+            <input type="hidden" name="longitude" id="longitude" />
+            <input type="hidden" name="city" id="city" />
+            <input type="hidden" name="barangay" id="barangay" />
+            <input type="hidden" name="street" id="street" />
+            <input type="hidden" name="province" id="province" />
+            <div id="address-display" class="mt-2 text-sm text-gray-700">
+              <p>
+                <span class="font-semibold">Street:</span>
+                <span id="display-street"></span>
+              </p>
+              <p>
+                <span class="font-semibold">Barangay:</span>
+                <span id="display-barangay"></span>
+              </p>
+              <p>
+                <span class="font-semibold">City:</span>
+                <span id="display-city"></span>
+              </p>
+              <p>
+                <span class="font-semibold">Province:</span>
+                <span id="display-province"></span>
+              </p>
+            </div>
           </div>
-          <div
-            class="h-64 rounded-xl overflow-hidden border border-gray-300 shadow-inner"
-          >
-            <!-- Map container -->
-            <div id="report-map" class="w-full h-full"></div>
-          </div>
-          <!-- Hidden Location Inputs and Address Display -->
-          <input type="hidden" name="latitude" id="latitude" />
-          <input type="hidden" name="longitude" id="longitude" />
-          <input type="hidden" name="city" id="city" />
-          <input type="hidden" name="barangay" id="barangay" />
-          <input type="hidden" name="street" id="street" />
-          <input type="hidden" name="province" id="province" />
-          <div id="address-display" class="mt-2 text-sm text-gray-700">
-            <p>
-              <span class="font-semibold">Street:</span>
-              <span id="display-street"></span>
-            </p>
-            <p>
-              <span class="font-semibold">Barangay:</span>
-              <span id="display-barangay"></span>
-            </p>
-            <p>
-              <span class="font-semibold">City:</span>
-              <span id="display-city"></span>
-            </p>
-            <p>
-              <span class="font-semibold">Province:</span>
-              <span id="display-province"></span>
-            </p>
+          <div id="manual-tab" class="tab-content hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input
+                type="text"
+                id="manual-street"
+                name="manual-street"
+                class="input-modern"
+                placeholder="Street"
+              />
+              <input
+                type="text"
+                id="manual-barangay"
+                name="manual-barangay"
+                class="input-modern"
+                placeholder="Barangay"
+              />
+              <input
+                type="text"
+                id="manual-city"
+                name="manual-city"
+                class="input-modern"
+                placeholder="City"
+              />
+              <input
+                type="text"
+                id="manual-province"
+                name="manual-province"
+                class="input-modern"
+                placeholder="Province"
+              />
+            </div>
           </div>
         </div>
+        <script>
+          function showTab(tab) {
+            document.getElementById("geo-tab").classList.add("hidden");
+            document.getElementById("manual-tab").classList.add("hidden");
+            var links = document.getElementsByClassName("tab-link");
+            for (var i = 0; i < links.length; i++) {
+              links[i].classList.remove("active");
+            }
+            if (tab === "geo") {
+              document.getElementById("geo-tab").classList.remove("hidden");
+              links[0].classList.add("active");
+            } else {
+              document.getElementById("manual-tab").classList.remove("hidden");
+              links[1].classList.add("active");
+            }
+          }
+          document.addEventListener("DOMContentLoaded", function () {
+            showTab("geo");
+          });
+        </script>
         <!-- Description -->
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
           <label class="block text-lg font-semibold text-gray-800 mb-3"

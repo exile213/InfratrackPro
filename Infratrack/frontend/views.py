@@ -1,15 +1,41 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse # Add this import
 from geopy.geocoders import Nominatim # Ensure this import is at the top
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from .models import Users
 
 def home(request):
     """Home page view"""
     return render(request, 'frontend/home.html')
 
-def login(request):
-    """Login page view"""
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        
+        try:
+            # Find user by email
+            user = Users.objects.get(email=email)
+            
+            # Check password (in a real app, you'd use proper password hashing)
+            if user.password == password:  # Note: In production, use proper password hashing!
+                # Set session
+                request.session['user_id'] = user.id
+                request.session['username'] = user.username
+                request.session['role'] = user.role_user.name
+                
+                messages.success(request, 'Login successful!')
+                return redirect('frontend:dashboard')  # Updated to include namespace
+            else:
+                messages.error(request, 'Invalid password!')
+        except Users.DoesNotExist:
+            messages.error(request, 'No account found with this email!')
+        
+        return render(request, 'frontend/login.html')
+    
     return render(request, 'frontend/login.html')
 
 def register_agency(request):
@@ -18,8 +44,19 @@ def register_agency(request):
 
 @login_required
 def dashboard(request):
-    """Dashboard view for authenticated users"""
-    return render(request, 'frontend/dashboard.html')
+    # Check if user is logged in
+    if 'user_id' not in request.session:
+        messages.error(request, 'Please login first!')
+        return redirect('login')
+    
+    # Get user data
+    user = Users.objects.get(id=request.session['user_id'])
+    
+    context = {
+        'user': user,
+        'role': request.session['role']
+    }
+    return render(request, 'frontend/dashboard.html', context)
 
 @login_required
 def analytics(request):
@@ -113,3 +150,9 @@ def reverse_geocode(request):
             return JsonResponse({'error': 'Address not found for the given coordinates.'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+def logout_view(request):
+    # Clear the session
+    request.session.flush()
+    messages.success(request, 'You have been successfully logged out.')
+    return redirect('frontend:login')
