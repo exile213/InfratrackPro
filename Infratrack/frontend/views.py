@@ -84,7 +84,7 @@ def geocode(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-"""NON URL VIEWS HERE"""
+"""GEOCODING  VIEWS"""
 # Modified reverse_geocode to be a Django view
 def reverse_geocode(request):
     lat = request.GET.get('lat')

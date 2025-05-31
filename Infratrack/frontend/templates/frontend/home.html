@@ -57,10 +57,9 @@
 
             document.getElementById("city").value = city;
             document.getElementById("barangay").value = barangay;
-            document.getElementById("road").value = road;
+            document.getElementById("street").value = street;
             document.getElementById("province").value = province;
-            document.getElementById("display-road").innerText =
-              data.address.road || "";
+            document.getElementById("display-street").innerText = data.address.road || data.address.street || "";
             document.getElementById("display-barangay").innerText =
               data.address.village ||
               data.address.suburb ||
@@ -128,10 +127,9 @@
 
               document.getElementById("city").value = city;
               document.getElementById("barangay").value = barangay;
-              document.getElementById("road").value = road;
+              document.getElementById("street").value = street;
               document.getElementById("province").value = province;
-              document.getElementById("display-road").innerText =
-                data.address.road || "";
+              document.getElementById("display-street").innerText = data.address.road || data.address.street || "";
               document.getElementById("display-barangay").innerText =
                 data.address.village ||
                 data.address.suburb ||
@@ -191,20 +189,29 @@
           document.getElementById("longitude").value = lng;
 
           const address = data.address;
-          const road = address.road || "";
+          const street = address.road || address.street || "";
           const city =
-            address.city || address.town || address.municipality || "";
+            address.city ||
+            address.town ||
+            address.municipality ||
+            address.village ||
+            address.suburb ||
+            address.hamlet ||
+            "";
           const barangay =
             address.suburb || address.village || address.hamlet || "";
           const province =
-            address.state || address.county || address.state_district || "";
+            address.state ||
+            address.county ||
+            address.state_district ||
+            address.region ||
+            "";
 
           document.getElementById("city").value = city;
           document.getElementById("barangay").value = barangay;
-          document.getElementById("road").value = road;
+          document.getElementById("street").value = street;
           document.getElementById("province").value = province;
-          document.getElementById("display-road").innerText =
-            data.address.road || "";
+          document.getElementById("display-street").innerText = data.address.road || data.address.street || "";
           document.getElementById("display-barangay").innerText =
             data.address.village ||
             data.address.suburb ||
@@ -331,12 +338,12 @@
           <input type="hidden" name="longitude" id="longitude" />
           <input type="hidden" name="city" id="city" />
           <input type="hidden" name="barangay" id="barangay" />
-          <input type="hidden" name="road" id="road" />
+          <input type="hidden" name="street" id="street" />
           <input type="hidden" name="province" id="province" />
           <div id="address-display" class="mt-2 text-sm text-gray-700">
             <p>
-              <span class="font-semibold">Road:</span>
-              <span id="display-road"></span>
+              <span class="font-semibold">Street:</span>
+              <span id="display-street"></span>
             </p>
             <p>
               <span class="font-semibold">Barangay:</span>
