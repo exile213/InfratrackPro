@@ -55,6 +55,33 @@ def not_found(request):
     """404 Not Found page"""
     return render(request, 'frontend/404.html', status=404)
 
+def geocode(request):
+    query = request.GET.get('query')
+
+    if not query:
+        return JsonResponse({'error': 'Query parameter is required.'}, status=400)
+
+    try:
+        geolocator = Nominatim(user_agent="public-infra-reporting-app")
+        location = geolocator.geocode(query)
+
+        if location:
+            address_data = {
+                'latitude': location.latitude,
+                'longitude': location.longitude,
+                'display_name': location.address,
+                'address': {
+                    'road': location.raw.get('address', {}).get('road', ''),
+                    'city': location.raw.get('address', {}).get('city', location.raw.get('address', {}).get('town', location.raw.get('address', {}).get('municipality', location.raw.get('address', {}).get('city_district', '')))),
+                    'suburb': location.raw.get('address', {}).get('suburb', location.raw.get('address', {}).get('village', location.raw.get('address', {}).get('hamlet', ''))),
+                    'state': location.raw.get('address', {}).get('state', location.raw.get('address', {}).get('county', location.raw.get('address', {}).get('state_district', ''))),
+                }
+            }
+            return JsonResponse(address_data)
+        else:
+            return JsonResponse({'error': 'Location not found.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 """NON URL VIEWS HERE"""
