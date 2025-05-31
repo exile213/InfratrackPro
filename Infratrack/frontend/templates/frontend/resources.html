@@ -1,0 +1,195 @@
+{% extends 'base.html' %} {% block title %}InfraTrack - Resources{% endblock %}
+{% block content %}
+<div class="py-8 lg:py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-extrabold text-gray-900">Resources</h1>
+      <button
+        type="button"
+        class="btn-primary inline-flex items-center px-4 py-2"
+      >
+        <svg
+          class="h-5 w-5 mr-2 -ml-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        Add Resource
+      </button>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Resource Filters -->
+    <div class="bg-white shadow-xl rounded-xl p-6 border border-gray-100 mb-8">
+      <h3 class="text-xl font-bold text-gray-900 mb-4">Filter Resources</h3>
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <label for="type" class="block text-sm font-medium text-gray-700"
+            >Resource Type</label
+          >
+          <select id="type" name="type" class="input-modern">
+            <option value="all">All Types</option>
+            <option value="equipment">Equipment</option>
+            <option value="material">Material</option>
+            <option value="labor">Labor</option>
+          </select>
+        </div>
+        <div>
+          <label for="status" class="block text-sm font-medium text-gray-700"
+            >Status</label
+          >
+          <select id="status" name="status" class="input-modern">
+            <option value="all">All Status</option>
+            <option value="available">Available</option>
+            <option value="in-use">In Use</option>
+            <option value="maintenance">Maintenance</option>
+          </select>
+        </div>
+        <div>
+          <label for="project" class="block text-sm font-medium text-gray-700"
+            >Project</label
+          >
+          <select id="project" name="project" class="input-modern">
+            <option value="all">All Projects</option>
+            <option value="highway">Highway Expansion</option>
+            <option value="bridge">Bridge Construction</option>
+          </select>
+        </div>
+        <div>
+          <label for="search" class="block text-sm font-medium text-gray-700"
+            >Search</label
+          >
+          <input
+            type="text"
+            name="search"
+            id="search"
+            class="input-modern"
+            placeholder="Search resources..."
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Resources List -->
+    <div class="mt-8">
+      <div
+        class="bg-white shadow-xl rounded-xl overflow-hidden border border-gray-100"
+      >
+        <ul class="divide-y divide-gray-200">
+          <!-- Resource Item -->
+          <li>
+            <div
+              class="block hover:bg-gray-50 transition duration-150 ease-in-out px-4 py-4 sm:px-6"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 bg-indigo-100 p-3 rounded-full">
+                    <svg
+                      class="h-6 w-6 text-indigo-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                      />
+                    </svg>
+                  </div>
+                  <div class="ml-4">
+                    <h2 class="text-lg font-bold text-gray-900">
+                      Excavator CAT 320
+                    </h2>
+                    <p class="text-sm text-gray-600">Equipment</p>
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <span
+                    class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                  >
+                    Available
+                  </span>
+                </div>
+              </div>
+              <div class="mt-4 sm:flex sm:justify-between">
+                <div class="sm:flex space-y-2 sm:space-y-0 sm:space-x-6">
+                  <div class="flex items-center text-sm text-gray-500">
+                    <svg
+                      class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Last Maintenance:
+                    <span class="font-medium ml-1">Jan 10, 2024</span>
+                  </div>
+                  <div class="flex items-center text-sm text-gray-500">
+                    <svg
+                      class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Next Maintenance:
+                    <span class="font-medium ml-1">Apr 10, 2024</span>
+                  </div>
+                </div>
+                <div
+                  class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0"
+                >
+                  <svg
+                    class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Daily Rate: <span class="font-medium ml-1">$500</span>
+                </div>
+              </div>
+              <div class="mt-4 flex justify-end space-x-3">
+                <button type="button" class="btn-secondary">
+                  View Details
+                </button>
+                <button type="button" class="btn-primary">Edit Resource</button>
+              </div>
+            </div>
+          </li>
+
+          <!-- Add more resource items here -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

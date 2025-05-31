@@ -1,0 +1,352 @@
+{% extends 'base.html' %} {% block title %}Agency Dashboard{% endblock %} {%
+block content %}
+<div class="max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+  <div
+    class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4"
+  >
+    <div>
+      <h2 class="text-3xl font-extrabold text-gray-900">Agency Dashboard</h2>
+      <p class="text-gray-600 text-md mt-1">
+        Overview of infrastructure reports and agency activities.
+      </p>
+    </div>
+    <div
+      class="text-right bg-white p-3 rounded-lg shadow-sm border border-gray-200"
+    >
+      <span class="font-semibold text-gray-700">Welcome,</span>
+      <span class="text-indigo-600 font-bold">DPWH 1st DEO Administrator</span>
+    </div>
+  </div>
+  <div class="bg-white rounded-xl shadow-lg p-6 lg:p-8 border border-gray-100">
+    <h4 class="text-2xl font-bold text-gray-800 mb-6">
+      Infrastructure Reports
+    </h4>
+    <div class="flex flex-col sm:flex-row gap-3 mb-6">
+      <select class="input-modern">
+        <option>All Types</option>
+        <option>Pothole</option>
+        <option>Drainage</option>
+      </select>
+      <select class="input-modern">
+        <option>All Status</option>
+        <option>Active</option>
+        <option>Resolved</option>
+      </select>
+      <button class="btn-primary flex-shrink-0">
+        <svg
+          class="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01.293.707V19a2 2 0 01-2 2H4a2 2 0 01-2-2V7.293a1 1 0 01.293-.707L3 4z"
+          />
+        </svg>
+        Apply Filters
+      </button>
+    </div>
+    <div class="space-y-5">
+      <!-- Report Card 1 -->
+      <div
+        class="flex flex-col sm:flex-row bg-gray-50 rounded-lg shadow-sm p-5 items-start sm:items-center gap-4 border border-gray-100 hover:shadow-md transition-all duration-200"
+      >
+        <img
+          src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=facearea&w=100&h=100&q=80"
+          alt="pothole"
+          class="w-24 h-24 rounded-lg object-cover shadow-sm"
+        />
+        <div class="flex-1">
+          <div class="font-bold text-gray-800 text-lg">
+            Pothole - Saint Anne Subdivision, Bacolod
+            <span
+              class="ml-3 inline-block bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full font-medium"
+              >Active</span
+            >
+          </div>
+          <div class="text-gray-600 text-sm mt-1">
+            Lacson Street pothole, in Bacolod City. Urgent attention required
+            due to traffic disruption.
+          </div>
+          <div
+            class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-500"
+          >
+            <span class="flex items-center gap-1"
+              ><svg
+                class="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0L6.343 16.657a8 8 0 1111.314 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              Negros Island Region</span
+            >
+            <span class="flex items-center gap-1"
+              ><svg
+                class="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m4 0h-1v-4h-1m-4 8h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Road Damage</span
+            >
+            <span class="flex items-center gap-1 text-gray-400"
+              >Tracking ID:
+              <span class="font-mono text-gray-600 ml-1"
+                >INF-2024-BA-688144080</span
+              ></span
+            >
+          </div>
+        </div>
+        <div class="text-sm text-gray-500 flex-shrink-0 mt-3 sm:mt-0">
+          2 days ago
+        </div>
+      </div>
+      <!-- Report Card 2 -->
+      <div
+        class="flex flex-col sm:flex-row bg-gray-50 rounded-lg shadow-sm p-5 items-start sm:items-center gap-4 border border-gray-100 hover:shadow-md transition-all duration-200"
+      >
+        <img
+          src="https://images.unsplash.com/photo-1464983953574-0892a16854b?auto=format&fit=facearea&w=100&h=100&q=80"
+          alt="drainage"
+          class="w-24 h-24 rounded-lg object-cover shadow-sm"
+        />
+        <div class="flex-1">
+          <div class="font-bold text-gray-800 text-lg">
+            Drainage - Villa Hergon Subdivision, Silay
+            <span
+              class="ml-3 inline-block bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full font-medium"
+              >Active</span
+            >
+          </div>
+          <div class="text-gray-600 text-sm mt-1">
+            Drainage issue in the main road of Silay, causing minor flooding
+            during heavy rains.
+          </div>
+          <div
+            class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-500"
+          >
+            <span class="flex items-center gap-1"
+              ><svg
+                class="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0L6.343 16.657a8 8 0 1111.314 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              Negros Occidental</span
+            >
+            <span class="flex items-center gap-1"
+              ><svg
+                class="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m4 0h-1v-4h-1m-4 8h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Drainage System</span
+            >
+            <span class="flex items-center gap-1 text-gray-400"
+              >Tracking ID:
+              <span class="font-mono text-gray-600 ml-1"
+                >INF-2024-SI-825444787</span
+              ></span
+            >
+          </div>
+        </div>
+        <div class="text-sm text-gray-500 flex-shrink-0 mt-3 sm:mt-0">
+          2 days ago
+        </div>
+      </div>
+      <!-- Report Card 3 -->
+      <div
+        class="flex flex-col sm:flex-row bg-gray-50 rounded-lg shadow-sm p-5 items-start sm:items-center gap-4 border border-gray-100 hover:shadow-md transition-all duration-200"
+      >
+        <img
+          src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=facearea&w=100&h=100&q=80"
+          alt="pothole"
+          class="w-24 h-24 rounded-lg object-cover shadow-sm"
+        />
+        <div class="flex-1">
+          <div class="font-bold text-gray-800 text-lg">
+            Pothole - Cauayan, Talisay
+            <span
+              class="ml-3 inline-block bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full font-medium"
+              >Active</span
+            >
+          </div>
+          <div class="text-gray-600 text-sm mt-1">
+            Talisay City main road pothole, causing inconvenience for commuters.
+          </div>
+          <div
+            class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-500"
+          >
+            <span class="flex items-center gap-1"
+              ><svg
+                class="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0L6.343 16.657a8 8 0 1111.314 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              Negros Occidental</span
+            >
+            <span class="flex items-center gap-1"
+              ><svg
+                class="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m4 0h-1v-4h-1m-4 8h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Road Damage</span
+            >
+            <span class="flex items-center gap-1 text-gray-400"
+              >Tracking ID:
+              <span class="font-mono text-gray-600 ml-1"
+                >INF-2024-TA-234567433</span
+              ></span
+            >
+          </div>
+        </div>
+        <div class="text-sm text-gray-500 flex-shrink-0 mt-3 sm:mt-0">
+          2 days ago
+        </div>
+      </div>
+      <!-- Report Card 4 -->
+      <div
+        class="flex flex-col sm:flex-row bg-gray-50 rounded-lg shadow-sm p-5 items-start sm:items-center gap-4 border border-gray-100 hover:shadow-md transition-all duration-200"
+      >
+        <img
+          src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=facearea&w=100&h=100&q=80"
+          alt="drainage"
+          class="w-24 h-24 rounded-lg object-cover shadow-sm"
+        />
+        <div class="flex-1">
+          <div class="font-bold text-gray-800 text-lg">
+            Drainage - Granada, Bacolod
+            <span
+              class="ml-3 inline-block bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full font-medium"
+              >Active</span
+            >
+          </div>
+          <div class="text-gray-600 text-sm mt-1">
+            Bacolod Drainage Economic highway problem, leading to water
+            accumulation.
+          </div>
+          <div
+            class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-500"
+          >
+            <span class="flex items-center gap-1"
+              ><svg
+                class="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0L6.343 16.657a8 8 0 1111.314 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              Negros Island Region</span
+            >
+            <span class="flex items-center gap-1"
+              ><svg
+                class="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m4 0h-1v-4h-1m-4 8h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Drainage System</span
+            >
+            <span class="flex items-center gap-1 text-gray-400"
+              >Tracking ID:
+              <span class="font-mono text-gray-600 ml-1"
+                >INF-2024-BA-663450082</span
+              ></span
+            >
+          </div>
+        </div>
+        <div class="text-sm text-gray-500 flex-shrink-0 mt-3 sm:mt-0">
+          2 days ago
+        </div>
+      </div>
+      <!-- Add more report cards as needed -->
+    </div>
+  </div>
+</div>
+{% endblock %}

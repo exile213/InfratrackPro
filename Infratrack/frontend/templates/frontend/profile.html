@@ -1,0 +1,232 @@
+{% extends 'base.html' %} {% block title %}InfraTrack - Profile{% endblock %} {%
+block content %}
+<div class="py-8 lg:py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-extrabold text-gray-900 mb-6">User Profile</h1>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
+      <!-- Profile Information -->
+      <div class="bg-white shadow-xl rounded-xl p-6 border border-gray-100">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">
+          Profile Information
+        </h3>
+        <div class="flex items-center mb-6">
+          <div class="flex-shrink-0">
+            <img
+              class="h-20 w-20 rounded-full border-4 border-indigo-200 shadow-md"
+              src="https://ui-avatars.com/api/?name=John+Doe&background=0D8ABC&color=fff"
+              alt="Profile picture"
+            />
+          </div>
+          <div class="ml-5">
+            <h4 class="text-2xl font-bold text-gray-900">John Doe</h4>
+            <p class="text-md text-gray-600">Project Manager</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+          <div class="sm:col-span-3">
+            <label
+              for="first_name"
+              class="block text-sm font-medium text-gray-700"
+              >First name</label
+            >
+            <input
+              type="text"
+              name="first_name"
+              id="first_name"
+              value="John"
+              class="input-modern"
+            />
+          </div>
+
+          <div class="sm:col-span-3">
+            <label
+              for="last_name"
+              class="block text-sm font-medium text-gray-700"
+              >Last name</label
+            >
+            <input
+              type="text"
+              name="last_name"
+              id="last_name"
+              value="Doe"
+              class="input-modern"
+            />
+          </div>
+
+          <div class="sm:col-span-4">
+            <label for="email" class="block text-sm font-medium text-gray-700"
+              >Email address</label
+            >
+            <input
+              type="email"
+              name="email"
+              id="email"
+              value="john.doe@example.com"
+              class="input-modern"
+            />
+          </div>
+
+          <div class="sm:col-span-3">
+            <label for="phone" class="block text-sm font-medium text-gray-700"
+              >Phone number</label
+            >
+            <input
+              type="text"
+              name="phone"
+              id="phone"
+              value="+1 (555) 123-4567"
+              class="input-modern"
+            />
+          </div>
+
+          <div class="sm:col-span-6">
+            <label for="bio" class="block text-sm font-medium text-gray-700"
+              >Bio</label
+            >
+            <textarea
+              id="bio"
+              name="bio"
+              rows="4"
+              class="input-modern resize-y"
+            >
+Experienced project manager with over 10 years in infrastructure development.</textarea
+            >
+          </div>
+        </div>
+        <div class="mt-8">
+          <button type="button" class="btn-primary">Save Changes</button>
+        </div>
+      </div>
+
+      <!-- Security Settings -->
+      <div class="bg-white shadow-xl rounded-xl p-6 border border-gray-100">
+        <h3 class="text-xl font-bold text-gray-900 mb-6">Security Settings</h3>
+        <div class="space-y-6">
+          <div>
+            <label
+              for="current_password"
+              class="block text-sm font-medium text-gray-700"
+              >Current Password</label
+            >
+            <input
+              type="password"
+              name="current_password"
+              id="current_password"
+              class="input-modern"
+            />
+          </div>
+
+          <div>
+            <label
+              for="new_password"
+              class="block text-sm font-medium text-gray-700"
+              >New Password</label
+            >
+            <input
+              type="password"
+              name="new_password"
+              id="new_password"
+              class="input-modern"
+            />
+          </div>
+
+          <div>
+            <label
+              for="confirm_password"
+              class="block text-sm font-medium text-gray-700"
+              >Confirm New Password</label
+            >
+            <input
+              type="password"
+              name="confirm_password"
+              id="confirm_password"
+              class="input-modern"
+            />
+          </div>
+        </div>
+        <div class="mt-8">
+          <button type="button" class="btn-primary">Update Password</button>
+        </div>
+      </div>
+
+      <!-- Notification Preferences -->
+      <div
+        class="bg-white shadow-xl rounded-xl p-6 border border-gray-100 lg:col-span-2"
+      >
+        <h3 class="text-xl font-bold text-gray-900 mb-6">
+          Notification Preferences
+        </h3>
+        <div class="space-y-5">
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input
+                id="email_notifications"
+                name="email_notifications"
+                type="checkbox"
+                checked
+                class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
+              />
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="email_notifications" class="font-medium text-gray-700"
+                >Email Notifications</label
+              >
+              <p class="text-gray-500">
+                Receive email notifications for project updates and important
+                events.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input
+                id="sms_notifications"
+                name="sms_notifications"
+                type="checkbox"
+                class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
+              />
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="sms_notifications" class="font-medium text-gray-700"
+                >SMS Notifications</label
+              >
+              <p class="text-gray-500">
+                Receive SMS notifications for urgent updates and alerts.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input
+                id="report_notifications"
+                name="report_notifications"
+                type="checkbox"
+                checked
+                class="focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded"
+              />
+            </div>
+            <div class="ml-3 text-sm">
+              <label
+                for="report_notifications"
+                class="font-medium text-gray-700"
+                >Report Notifications</label
+              >
+              <p class="text-gray-500">
+                Receive notifications when new reports are available.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-8">
+          <button type="button" class="btn-primary">Save Preferences</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

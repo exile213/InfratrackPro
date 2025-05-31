@@ -1,0 +1,196 @@
+{% extends 'base.html' %} {% block title %}InfraTrack - Reports{% endblock %} {%
+block content %}
+<div class="py-8 lg:py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-extrabold text-gray-900">Reports</h1>
+      <button
+        type="button"
+        class="btn-primary inline-flex items-center px-4 py-2"
+      >
+        <svg
+          class="h-5 w-5 mr-2 -ml-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        Generate Report
+      </button>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Report Filters -->
+    <div class="bg-white shadow-xl rounded-xl p-6 border border-gray-100 mb-8">
+      <h3 class="text-xl font-bold text-gray-900 mb-4">Filter Reports</h3>
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <label
+            for="report_type"
+            class="block text-sm font-medium text-gray-700"
+            >Report Type</label
+          >
+          <select id="report_type" name="report_type" class="input-modern">
+            <option value="all">All Reports</option>
+            <option value="project">Project Progress</option>
+            <option value="financial">Financial Summary</option>
+            <option value="resource">Resource Utilization</option>
+            <option value="quality">Quality Control</option>
+          </select>
+        </div>
+        <div>
+          <label
+            for="date_range"
+            class="block text-sm font-medium text-gray-700"
+            >Date Range</label
+          >
+          <select id="date_range" name="date_range" class="input-modern">
+            <option value="last_week">Last Week</option>
+            <option value="last_month">Last Month</option>
+            <option value="last_quarter">Last Quarter</option>
+            <option value="last_year">Last Year</option>
+            <option value="custom">Custom Range</option>
+          </select>
+        </div>
+        <div>
+          <label for="project" class="block text-sm font-medium text-gray-700"
+            >Project</label
+          >
+          <select id="project" name="project" class="input-modern">
+            <option value="all">All Projects</option>
+            <option value="highway">Highway Expansion</option>
+            <option value="bridge">Bridge Construction</option>
+          </select>
+        </div>
+        <div>
+          <label for="format" class="block text-sm font-medium text-gray-700"
+            >Format</label
+          >
+          <select id="format" name="format" class="input-modern">
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+            <option value="csv">CSV</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports List -->
+    <div class="mt-8">
+      <div
+        class="bg-white shadow-xl rounded-xl overflow-hidden border border-gray-100"
+      >
+        <ul class="divide-y divide-gray-200">
+          <!-- Report Item -->
+          <li>
+            <div
+              class="block hover:bg-gray-50 transition duration-150 ease-in-out px-4 py-4 sm:px-6"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 bg-indigo-100 p-3 rounded-full">
+                    <svg
+                      class="h-6 w-6 text-indigo-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div class="ml-4">
+                    <h2 class="text-lg font-bold text-gray-900">
+                      Q1 2024 Project Progress Report
+                    </h2>
+                    <p class="text-sm text-gray-600">Project Progress Report</p>
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <span
+                    class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                  >
+                    PDF
+                  </span>
+                </div>
+              </div>
+              <div class="mt-4 sm:flex sm:justify-between">
+                <div class="sm:flex space-y-2 sm:space-y-0 sm:space-x-6">
+                  <div class="flex items-center text-sm text-gray-500">
+                    <svg
+                      class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    Generated:
+                    <span class="font-medium ml-1">Mar 31, 2024</span>
+                  </div>
+                  <div class="flex items-center text-sm text-gray-500">
+                    <svg
+                      class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Size: <span class="font-medium ml-1">2.4 MB</span>
+                  </div>
+                </div>
+                <div
+                  class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0"
+                >
+                  <svg
+                    class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  Generated by: <span class="font-medium ml-1">John Doe</span>
+                </div>
+              </div>
+              <div class="mt-4 flex justify-end space-x-3">
+                <button type="button" class="btn-secondary">View Report</button>
+                <button type="button" class="btn-primary">Download</button>
+              </div>
+            </div>
+          </li>
+
+          <!-- Add more report items here -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

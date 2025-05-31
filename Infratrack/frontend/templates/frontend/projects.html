@@ -1,0 +1,199 @@
+{% extends 'base.html' %} {% block title %}InfraTrack - Projects{% endblock %}
+{% block content %}
+<div class="py-8 lg:py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-extrabold text-gray-900">Projects</h1>
+      <button
+        type="button"
+        class="btn-primary inline-flex items-center px-4 py-2"
+      >
+        <svg
+          class="h-5 w-5 mr-2 -ml-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        New Project
+      </button>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Project Filters -->
+    <div class="bg-white shadow-xl rounded-xl p-6 border border-gray-100 mb-8">
+      <h3 class="text-xl font-bold text-gray-900 mb-4">Filter Projects</h3>
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <label for="status" class="block text-sm font-medium text-gray-700"
+            >Status</label
+          >
+          <select id="status" name="status" class="input-modern">
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+            <option value="on-hold">On Hold</option>
+          </select>
+        </div>
+        <div>
+          <label for="type" class="block text-sm font-medium text-gray-700"
+            >Project Type</label
+          >
+          <select id="type" name="type" class="input-modern">
+            <option value="all">All Types</option>
+            <option value="road">Road Construction</option>
+            <option value="bridge">Bridge</option>
+            <option value="building">Building</option>
+          </select>
+        </div>
+        <div>
+          <label for="priority" class="block text-sm font-medium text-gray-700"
+            >Priority</label
+          >
+          <select id="priority" name="priority" class="input-modern">
+            <option value="all">All Priorities</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div>
+          <label for="search" class="block text-sm font-medium text-gray-700"
+            >Search</label
+          >
+          <input
+            type="text"
+            name="search"
+            id="search"
+            class="input-modern"
+            placeholder="Search projects..."
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Projects List -->
+    <div class="mt-8">
+      <div
+        class="bg-white shadow-xl rounded-xl overflow-hidden border border-gray-100"
+      >
+        <ul class="divide-y divide-gray-200">
+          <!-- Project Item -->
+          <li>
+            <div
+              class="block hover:bg-gray-50 transition duration-150 ease-in-out px-4 py-4 sm:px-6"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 bg-indigo-100 p-3 rounded-full">
+                    <svg
+                      class="h-6 w-6 text-indigo-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                      />
+                    </svg>
+                  </div>
+                  <div class="ml-4">
+                    <h2 class="text-lg font-bold text-gray-900">
+                      Highway Expansion Project
+                    </h2>
+                    <p class="text-sm text-gray-600">Road Construction</p>
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <span
+                    class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                  >
+                    Active
+                  </span>
+                  <span
+                    class="ml-4 px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+                  >
+                    High Priority
+                  </span>
+                </div>
+              </div>
+              <div class="mt-4 sm:flex sm:justify-between">
+                <div class="sm:flex space-y-2 sm:space-y-0 sm:space-x-6">
+                  <div class="flex items-center text-sm text-gray-500">
+                    <svg
+                      class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    Started: <span class="font-medium ml-1">Jan 15, 2024</span>
+                  </div>
+                  <div class="flex items-center text-sm text-gray-500">
+                    <svg
+                      class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Due: <span class="font-medium ml-1">Jun 30, 2024</span>
+                  </div>
+                </div>
+                <div
+                  class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0"
+                >
+                  <svg
+                    class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Budget: <span class="font-medium ml-1">$2.4M</span>
+                </div>
+              </div>
+              <div class="mt-4 flex justify-end space-x-3">
+                <button type="button" class="btn-secondary">
+                  View Details
+                </button>
+                <button type="button" class="btn-primary">Edit Project</button>
+              </div>
+            </div>
+          </li>
+
+          <!-- Add more project items here -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
