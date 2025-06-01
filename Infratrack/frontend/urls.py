@@ -19,4 +19,7 @@ urlpatterns = [
     path('geocode/', views.geocode, name='geocode'),
     path('reverse-geocode/', views.reverse_geocode, name='reverse_geocode'),
     path('submit-report/', views.submit_report, name='submit_report'),
+    path('api/analytics/reports-over-time/', views.analytics_reports_over_time, name='analytics_reports_over_time'),
+    path('api/analytics/issues-by-type/', views.analytics_issues_by_type, name='analytics_issues_by_type'),
+    path('api/analytics/issues-by-location/', views.analytics_issues_by_location, name='analytics_issues_by_location'),
 ]

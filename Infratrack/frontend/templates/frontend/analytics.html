@@ -2,173 +2,43 @@
 {% block content %}
 <div class="py-6">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h1 class="text-2xl font-semibold text-gray-900">Analytics</h1>
-  </div>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-    <!-- Analytics Overview -->
-    <div class="mt-8">
-      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <!-- Project Completion Rate -->
-        <!-- Project Completion Rate -->
-        <div class="bg-white overflow-hidden shadow-lg rounded-xl hover:shadow-xl transition-shadow duration-300">
-          <div class="p-6">
-            <div class="flex items-center">
-              <div class="flex-shrink-0 bg-indigo-500 rounded-full p-3">
-                <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <div class="ml-5 w-0 flex-1">
-                <dl>
-                  <dt class="text-base font-medium text-gray-500">
-                    Project Completion Rate
-                  </dt>
-                  <dd class="flex items-baseline">
-                    <div class="text-3xl font-extrabold text-gray-900">85%</div>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Budget Utilization -->
-        <div class="bg-white overflow-hidden shadow-lg rounded-xl hover:shadow-xl transition-shadow duration-300">
-          <div class="p-6">
-            <div class="flex items-center">
-              <div class="flex-shrink-0 bg-green-500 rounded-full p-3">
-                <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div class="ml-5 w-0 flex-1">
-                <dl>
-                  <dt class="text-base font-medium text-gray-500">
-                    Budget Utilization
-                  </dt>
-                  <dd class="flex items-baseline">
-                    <div class="text-3xl font-extrabold text-gray-900">72%</div>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Resource Efficiency -->
-        <div class="bg-white overflow-hidden shadow-lg rounded-xl hover:shadow-xl transition-shadow duration-300">
-          <div class="p-6">
-            <div class="flex items-center">
-              <div class="flex-shrink-0 bg-yellow-500 rounded-full p-3">
-                <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div class="ml-5 w-0 flex-1">
-                <dl>
-                  <dt class="text-base font-medium text-gray-500">
-                    Resource Efficiency
-                  </dt>
-                  <dd class="flex items-baseline">
-                    <div class="text-3xl font-extrabold text-gray-900">88%</div>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quality Score -->
-        <div class="bg-white overflow-hidden shadow-lg rounded-xl hover:shadow-xl transition-shadow duration-300">
-          <div class="p-6">
-            <div class="flex items-center">
-              <div class="flex-shrink-0 bg-red-500 rounded-full p-3">
-                <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div class="ml-5 w-0 flex-1">
-                <dl>
-                  <dt class="text-base font-medium text-gray-500">
-                    Quality Score
-                  </dt>
-                  <dd class="flex items-baseline">
-                    <div class="text-3xl font-extrabold text-gray-900">92%</div>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
+    <h1 class="text-2xl font-semibold text-gray-900 mb-6">Analytics Dashboard</h1>
+    <!-- Main Analytics Tabs -->
+    <div x-data="{ tab: 'time' }" class="">
+      <div class="flex space-x-2 mb-6">
+        <button @click="tab = 'time'" :class="tab === 'time' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700'"
+          class="px-4 py-2 rounded-lg font-medium focus:outline-none transition">Issue Reports Over Time</button>
+        <button @click="tab = 'type'" :class="tab === 'type' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700'"
+          class="px-4 py-2 rounded-lg font-medium focus:outline-none transition">Issues by Type</button>
+        <button @click="tab = 'location'"
+          :class="tab === 'location' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700'"
+          class="px-4 py-2 rounded-lg font-medium focus:outline-none transition">Issues by Location</button>
       </div>
-    </div>
-
-    <!-- Charts Section -->
-    <div class="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
-      <!-- Project Progress Chart -->
-      <!-- Project Progress Chart -->
-      <div class="bg-white shadow-lg rounded-xl p-6 hover:shadow-xl transition-shadow duration-300">
-        <h3 class="text-xl font-semibold text-gray-900 mb-4">
-          Project Progress Over Time
-        </h3>
-        <div class="h-72 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
-          <p class="text-gray-500 text-lg">Chart will be displayed here</p>
+      <!-- Tab Panels -->
+      <div>
+        <!-- Issue Reports Over Time -->
+        <div x-show="tab === 'time'">
+          {% include 'frontend/analytics_tab_time.html' %}
         </div>
-      </div>
-
-      <!-- Budget Allocation Chart -->
-      <div class="bg-white shadow-lg rounded-xl p-6 hover:shadow-xl transition-shadow duration-300">
-        <h3 class="text-xl font-semibold text-gray-900 mb-4">
-          Budget Allocation
-        </h3>
-        <div class="h-72 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
-          <p class="text-gray-500 text-lg">Chart will be displayed here</p>
+        <!-- Issues by Type -->
+        <div x-show="tab === 'type'">
+          {% include 'frontend/analytics_tab_type.html' %}
         </div>
-      </div>
-    </div>
-
-    <!-- Performance Metrics -->
-    <div class="mt-8">
-      <div class="bg-white shadow-lg rounded-xl overflow-hidden">
-        <div class="px-6 py-5 bg-gray-50 border-b border-gray-200">
-          <h3 class="text-xl font-semibold text-gray-900">
-            Performance Metrics
-          </h3>
-        </div>
-        <div class="divide-y divide-gray-200">
-          <dl>
-            <div class="px-6 py-5 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <dt class="text-base font-medium text-gray-500">
-                Average Project Duration
-              </dt>
-              <dd class="mt-1 text-base text-gray-900 md:mt-0 md:col-span-2">
-                6.5 months
-              </dd>
-            </div>
-            <div class="bg-gray-50 px-6 py-5 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <dt class="text-base font-medium text-gray-500">
-                Cost per Project
-              </dt>
-              <dd class="mt-1 text-base text-gray-900 md:mt-0 md:col-span-2">
-                $450,000
-              </dd>
-            </div>
-            <div class="px-6 py-5 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <dt class="text-base font-medium text-gray-500">
-                Resource Utilization Rate
-              </dt>
-              <dd class="mt-1 text-base text-gray-900 md:mt-0 md:col-span-2">
-                78%
-              </dd>
-            </div>
-          </dl>
+        <!-- Issues by Location -->
+        <div x-show="tab === 'location'">
+          {% include 'frontend/analytics_tab_location.html' %}
         </div>
       </div>
     </div>
   </div>
 </div>
+<!-- Alpine.js for tab switching (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% block extra_js %}
+<script>
+  // Chart initialization will be handled in each tab's partial
+</script>
+{% endblock %}
 {% endblock %}

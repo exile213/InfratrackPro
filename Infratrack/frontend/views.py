@@ -10,6 +10,9 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import uuid
 from datetime import datetime
+from django.views.decorators.http import require_GET
+from django.utils.dateparse import parse_date
+from django.db.models import Count
 
 def home(request):
     """Home page view"""
@@ -274,3 +277,65 @@ def submit_report(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@require_GET
+def analytics_reports_over_time(request):
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    issue_type = request.GET.get('issue_type')
+    qs = Report.objects.all()
+    if start:
+        qs = qs.filter(created_at__date__gte=parse_date(start))
+    if end:
+        qs = qs.filter(created_at__date__lte=parse_date(end))
+    if issue_type and issue_type != 'All Types':
+        qs = qs.filter(issue_type__name=issue_type)
+    # Group by date and issue type
+    data = (
+        qs.values('created_at__date', 'issue_type__name')
+        .annotate(count=Count('id'))
+        .order_by('created_at__date')
+    )
+    # Format for Chart.js
+    result = {}
+    for row in data:
+        date = str(row['created_at__date'])
+        typ = row['issue_type__name']
+        if typ not in result:
+            result[typ] = {}
+        result[typ][date] = row['count']
+    return JsonResponse(result)
+
+@require_GET
+def analytics_issues_by_type(request):
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    qs = Report.objects.all()
+    if start:
+        qs = qs.filter(created_at__date__gte=parse_date(start))
+    if end:
+        qs = qs.filter(created_at__date__lte=parse_date(end))
+    data = (
+        qs.values('issue_type__name')
+        .annotate(count=Count('id'))
+        .order_by('issue_type__name')
+    )
+    result = {row['issue_type__name']: row['count'] for row in data}
+    return JsonResponse(result)
+
+@require_GET
+def analytics_issues_by_location(request):
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    qs = Report.objects.all()
+    if start:
+        qs = qs.filter(created_at__date__gte=parse_date(start))
+    if end:
+        qs = qs.filter(created_at__date__lte=parse_date(end))
+    data = (
+        qs.values('address')
+        .annotate(count=Count('id'))
+        .order_by('address')
+    )
+    result = {row['address']: row['count'] for row in data}
+    return JsonResponse(result)
