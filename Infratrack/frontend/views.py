@@ -5,7 +5,7 @@ from django.http import JsonResponse # Add this import
 from geopy.geocoders import Nominatim # Ensure this import is at the top
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from .models import Users, Report, Agency, IssueType, RoadType
+from .models import Users, Report, Agency, IssueType, RoadType, RoadTypeAgencyMapping
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import uuid
@@ -13,6 +13,8 @@ from datetime import datetime
 from django.views.decorators.http import require_GET
 from django.utils.dateparse import parse_date
 from django.db.models import Count
+import requests  # Add this import for Overpass API
+import time
 
 def home(request):
     """Home page view"""
@@ -49,13 +51,16 @@ def register_agency(request):
     """Agency registration page view"""
     return render(request, 'frontend/register_agency.html')
 
-@login_required
+def login_required_custom(view_func):
+    def wrapper(request, *args, **kwargs):
+        if 'user_id' not in request.session:
+            messages.error(request, 'Please login first!')
+            return redirect('frontend:login')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+@login_required_custom
 def dashboard(request):
-    # Check if user is logged in
-    if 'user_id' not in request.session:
-        messages.error(request, 'Please login first!')
-        return redirect('login')
-    
     # Get user data
     user = Users.objects.get(id=request.session['user_id'])
     
@@ -107,27 +112,27 @@ def dashboard(request):
     
     return render(request, 'frontend/dashboard.html', context)
 
-@login_required
+@login_required_custom
 def analytics(request):
     """Analytics view for authenticated users"""
     return render(request, 'frontend/analytics.html')
 
-@login_required
+@login_required_custom
 def projects(request):
     """Projects management view"""
     return render(request, 'frontend/projects.html')
 
-@login_required
+@login_required_custom
 def resources(request):
     """Resources management view"""
     return render(request, 'frontend/resources.html')
 
-@login_required
+@login_required_custom
 def reports(request):
     """Reports view"""
     return render(request, 'frontend/reports.html')
 
-@login_required
+@login_required_custom
 def profile(request):
     """User profile view"""
     return render(request, 'frontend/profile.html')
@@ -180,7 +185,18 @@ def reverse_geocode(request):
         return JsonResponse({'error': 'Latitude and longitude are required.'}, status=400)
 
     try:
-        geolocator = Nominatim(user_agent="public-infra-reporting-app")
+        # Convert string coordinates to float
+        lat = float(lat)
+        lon = float(lon)
+        
+        # Use a more specific user agent
+        geolocator = Nominatim(
+            user_agent="InfraTrack/1.0 (https://github.com/yourusername/infratrack; your@email.com) Python/3.x"
+        )
+        
+        # Add a small delay to respect rate limits
+        time.sleep(1)
+        
         location = geolocator.reverse((lat, lon), exactly_one=True)
 
         if location:
@@ -189,22 +205,127 @@ def reverse_geocode(request):
                 'display_name': location.address,
                 'address': {
                     'road': location.raw.get('address', {}).get('road', ''),
-                    'city': location.raw.get('address', {}).get('city', location.raw.get('address', {}).get('town', location.raw.get('address', {}).get('municipality', location.raw.get('address', {}).get('city_district', '')))),
-                    'suburb': location.raw.get('address', {}).get('suburb', location.raw.get('address', {}).get('village', location.raw.get('address', {}).get('hamlet', ''))),
-                    'state': location.raw.get('address', {}).get('state', location.raw.get('address', {}).get('county', location.raw.get('address', {}).get('state_district', ''))),
+                    'city': location.raw.get('address', {}).get('city', 
+                            location.raw.get('address', {}).get('town', 
+                            location.raw.get('address', {}).get('municipality', 
+                            location.raw.get('address', {}).get('city_district', '')))),
+                    'suburb': location.raw.get('address', {}).get('suburb', 
+                             location.raw.get('address', {}).get('village', 
+                             location.raw.get('address', {}).get('hamlet', ''))),
+                    'state': location.raw.get('address', {}).get('state', 
+                            location.raw.get('address', {}).get('county', 
+                            location.raw.get('address', {}).get('state_district', ''))),
                 }
             }
             return JsonResponse(address_data)
         else:
-            return JsonResponse({'error': 'Address not found for the given coordinates.'}, status=404)
+            return JsonResponse({
+                'error': 'Address not found for the given coordinates.',
+                'coordinates': {'lat': lat, 'lon': lon}
+            }, status=404)
+    except ValueError as e:
+        return JsonResponse({
+            'error': 'Invalid coordinates format.',
+            'details': str(e),
+            'received': {'lat': lat, 'lon': lon}
+        }, status=400)
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+        print(f"Error in reverse_geocode: {str(e)}")  # Add server-side logging
+        return JsonResponse({
+            'error': 'An error occurred while processing your request.',
+            'details': str(e),
+            'coordinates': {'lat': lat, 'lon': lon}
+        }, status=500)
 
 def logout_view(request):
     # Clear the session
     request.session.flush()
     messages.success(request, 'You have been successfully logged out.')
     return redirect('frontend:login')
+
+def classify_road_and_assign_agency(lat, lon, city=None):
+    """
+    Classifies the road type at the given lat/lon using Overpass API and assigns the correct agency.
+    Returns (agency, road_type_str, road_name)
+    """
+    from .models import RoadTypeAgencyMapping
+    
+    overpass_url = "https://overpass-api.de/api/interpreter"
+    query = f"""
+    [out:json];
+    way(around:20,{lat},{lon})["highway"];
+    out tags center 1;
+    """
+    try:
+        response = requests.post(overpass_url, data={'data': query}, timeout=10)
+        data = response.json()
+        if data['elements']:
+            way = data['elements'][0]
+            highway_type = way['tags'].get('highway')
+            road_name = way['tags'].get('name', '')
+            
+            # Determine jurisdiction type based on highway type
+            # National roads take precedence regardless of location
+            if highway_type in ['motorway', 'trunk', 'primary', 'secondary']:
+                jurisdiction_type = 'national'
+                # For national roads, always use DPWH regardless of city
+                dpwh_agency = Agency.objects.filter(name__icontains="DPWH").first()
+                if dpwh_agency:
+                    # Get the exact road type from our database
+                    road_type = RoadType.objects.filter(name=highway_type).first()
+                    if not road_type:
+                        # If exact match not found, try to find a similar type
+                        if highway_type == 'motorway':
+                            road_type = RoadType.objects.filter(name__icontains='highway').first()
+                        elif highway_type == 'trunk':
+                            road_type = RoadType.objects.filter(name__icontains='major').first()
+                        elif highway_type in ['primary', 'secondary']:
+                            road_type = RoadType.objects.filter(name__icontains='arterial').first()
+                    
+                    if not road_type:
+                        road_type = RoadType.objects.first()  # Fallback to first road type
+                    
+                    return dpwh_agency, highway_type, road_name
+            else:
+                jurisdiction_type = 'city'
+            
+            # Get the appropriate road type from our database
+            road_type = RoadType.objects.filter(name=highway_type).first()
+            if not road_type:
+                # If exact match not found, try to find a similar type
+                if highway_type == 'tertiary':
+                    road_type = RoadType.objects.filter(name__icontains='tertiary').first()
+                elif highway_type in ['residential', 'living_street']:
+                    road_type = RoadType.objects.filter(name__icontains='residential').first()
+                elif highway_type == 'service':
+                    road_type = RoadType.objects.filter(name__icontains='service').first()
+                elif highway_type == 'unclassified':
+                    road_type = RoadType.objects.filter(name__icontains='unclassified').first()
+                
+                if not road_type:
+                    road_type = RoadType.objects.first()  # Fallback to first road type
+            
+            # For non-national roads, find the appropriate city agency
+            if jurisdiction_type == 'city':
+                if not city:
+                    city = way['tags'].get('addr:city', '')
+                mapping = RoadTypeAgencyMapping.objects.filter(
+                    jurisdiction_type='city',
+                    road_type=road_type,
+                    agency__city__iexact=city
+                ).first()
+                
+                if mapping:
+                    return mapping.agency, highway_type, road_name
+            
+            # Fallback to default agency if no mapping found
+            default_agency = Agency.objects.filter(name__icontains="DPWH").first()
+            return default_agency, highway_type, road_name
+        else:
+            return None, None, None
+    except Exception as e:
+        print(f"Error in Overpass API: {e}")
+        return None, None, None
 
 def submit_report(request):
     if request.method == 'POST':
@@ -227,12 +348,14 @@ def submit_report(request):
 
             # Get required data
             try:
-                default_agency = Agency.objects.select_for_update().first()
-                if not default_agency:
-                    return JsonResponse({'error': 'No agency available'}, status=400)
-
+                lat = request.POST.get('latitude')
+                lon = request.POST.get('longitude')
+                city = request.POST.get('city')
+                agency, road_type_str, road_name = classify_road_and_assign_agency(lat, lon, city)
+                if not agency:
+                    agency = Agency.objects.select_for_update().first()  # fallback
                 issue_type = IssueType.objects.select_for_update().get(name=request.POST.get('issue_type'))
-                road_type = RoadType.objects.select_for_update().get(name='Asphalt')
+                road_type = RoadType.objects.select_for_update().get(name=road_type_str or 'Asphalt')
             except (Agency.DoesNotExist, IssueType.DoesNotExist, RoadType.DoesNotExist) as e:
                 print(f"Database object not found: {str(e)}")
                 return JsonResponse({'error': 'Required data not found in database'}, status=400)
@@ -246,11 +369,11 @@ def submit_report(request):
                     tracking_code=tracking_code,
                     description=request.POST.get('description'),
                     photo_url=photo_url,
-                    latitude=request.POST.get('latitude'),
-                    longitude=request.POST.get('longitude'),
+                    latitude=lat,
+                    longitude=lon,
                     address=request.POST.get('address'),
-                    road_name=request.POST.get('road_name'),
-                    assigned_agency=default_agency,
+                    road_name=road_name or request.POST.get('road_name'),
+                    assigned_agency=agency,
                     status_report_status='Pending',
                     citizen_name=request.POST.get('full_name'),
                     citizen_email=request.POST.get('email'),
@@ -269,7 +392,10 @@ def submit_report(request):
             return JsonResponse({
                 'success': True,
                 'tracking_code': tracking_code,
-                'message': 'Report submitted successfully'
+                'message': 'Report submitted successfully',
+                'assigned_agency': agency.name if agency else None,
+                'road_type': road_type_str,
+                'road_name': road_name
             })
 
         except Exception as e:
