@@ -16,71 +16,137 @@
         maxZoom: 19,
         attribution: "© OpenStreetMap",
       }).addTo(map);
-      map.on("click", function (e) {
-        const lat = e.latlng.lat;
-        const lng = e.latlng.lng;
-        if (marker) {
-          map.removeLayer(marker);
-        }
-        marker = L.marker([lat, lng]).addTo(map);
-        document.getElementById("latitude").value = lat;
-        document.getElementById("longitude").value = lng;
-        fetch(
-          `/reverse-geocode/?lat=${lat}&lon=${lng}` // Updated URL to your Django backend
-        )
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
+
+      // Load all city polygons from GeoJSON and allow reporting only within them
+      fetch('/static/CitiesGEO.geojson')
+        .then(response => response.json())
+        .then(geojsonData => {
+          const allowedLayer = L.geoJSON(geojsonData, {
+            style: {
+              color: '#16a34a',
+              fillColor: '#4ade80',
+              fillOpacity: 0.3,
+              weight: 3,
+              dashArray: '5, 5'
             }
-            return response.json();
-          })
-          .then((data) => {
-            if (data.error) {
-              console.error("Error from backend:", data.error);
-              document.getElementById("address-display").textContent =
-                "Could not fetch address.";
+          }).addTo(map);
+
+          // Add city name labels
+          allowedLayer.eachLayer(function (layer) {
+            if (layer.feature && layer.feature.properties && layer.feature.properties.MUNICIPALI) {
+              const center = layer.getBounds().getCenter();
+              L.marker(center, {
+                icon: L.divIcon({
+                  className: 'city-label',
+                  html: `<div style=\"background: white; padding: 5px; border-radius: 3px; font-weight: bold; font-size: 12px;\">${layer.feature.properties.MUNICIPALI}</div>`,
+                  iconSize: [120, 20]
+                })
+              }).addTo(map);
+            }
+          });
+
+          // Restrict marker placement to inside these polygons
+          map.on('click', function (e) {
+            let allowed = false;
+            allowedLayer.eachLayer(function (layer) {
+              if (layer instanceof L.Polygon && layer.getBounds().contains(e.latlng)) {
+                allowed = true;
+              }
+            });
+            if (!allowed) {
+              // Show error message
+              const errorAlert = document.createElement('div');
+              errorAlert.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded';
+              errorAlert.innerHTML = `
+                <strong class=\"font-bold\">Error!</strong>
+                <span class=\"block sm:inline\">Reports are only allowed in the 8 selected cities.</span>
+              `;
+              document.body.appendChild(errorAlert);
+              setTimeout(() => errorAlert.remove(), 5000);
               return;
             }
-            // Adjusting to the structure returned by your Django view using geopy
-            const address = data.address;
-            const road = address.road || "";
-            const city =
-              address.city || address.town || address.municipality || "";
-            const barangay =
-              address.suburb || address.village || address.hamlet || "";
-            const province =
-              address.state || address.county || address.state_district || "";
-            const fullAddress = data.display_name;
+            if (marker) {
+              map.removeLayer(marker);
+            }
+            marker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+            document.getElementById("latitude").value = e.latlng.lat;
+            document.getElementById("longitude").value = e.latlng.lng;
+            fetch(`/reverse-geocode/?lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+              })
+              .then((data) => {
+                if (data.error) {
+                  console.error("Error from backend:", data.error);
+                  document.getElementById("address-display").textContent =
+                    "Could not fetch address.";
+                  return;
+                }
+                // Adjusting to the structure returned by your Django view using geopy
+                const address = data.address;
+                const road = address.road || "";
+                const city =
+                  address.city || address.town || address.municipality || "";
+                const barangay =
+                  address.suburb || address.village || address.hamlet || "";
+                const province =
+                  address.state || address.county || address.state_district || "";
+                const fullAddress = data.display_name;
 
-            document.getElementById("city").value = city;
-            document.getElementById("barangay").value = barangay;
-            document.getElementById("street").value = street;
-            document.getElementById("province").value = province;
-            document.getElementById("display-street").innerText =
-              data.address.road || data.address.street || "";
-            document.getElementById("display-barangay").innerText =
-              data.address.village ||
-              data.address.suburb ||
-              data.address.hamlet ||
-              "";
-            document.getElementById("display-city").innerText =
-              data.address.city ||
-              data.address.town ||
-              data.address.municipality ||
-              data.address.city_district ||
-              "";
-            document.getElementById("display-province").innerText =
-              data.address.state ||
-              data.address.county ||
-              data.address.state_district ||
-              "";
-          })
-          .catch((error) => {
-            console.error("Fetch error:", error);
-            document.getElementById("address-display").textContent =
-              "Error fetching address details.";
+                document.getElementById("city").value = city;
+                document.getElementById("barangay").value = barangay;
+                document.getElementById("street").value = street;
+                document.getElementById("province").value = province;
+                document.getElementById("display-street").innerText =
+                  data.address.road || data.address.street || "";
+                document.getElementById("display-barangay").innerText =
+                  data.address.village ||
+                  data.address.suburb ||
+                  data.address.hamlet ||
+                  "";
+                document.getElementById("display-city").innerText =
+                  data.address.city ||
+                  data.address.town ||
+                  data.address.municipality ||
+                  data.address.city_district ||
+                  "";
+                document.getElementById("display-province").innerText =
+                  data.address.state ||
+                  data.address.county ||
+                  data.address.state_district ||
+                  "";
+              })
+              .catch((error) => {
+                console.error("Fetch error:", error);
+                document.getElementById("address-display").textContent =
+                  "Error fetching address details.";
+              });
           });
-      });
+        });
+
+      // Add a legend to show allowed areas
+      const legend = L.control({ position: 'bottomright' });
+      legend.onAdd = function (map) {
+        const div = L.DomUtil.create('div', 'info legend');
+        div.innerHTML = `
+          <div style="background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2);">
+            <h4 style="margin: 0 0 5px;">Reporting Areas</h4>
+            <div style="display: flex; align-items: center; margin: 5px 0;">
+              <div style="width: 20px; height: 20px; background: #4ade80; opacity: 0.2; margin-right: 5px;"></div>
+              <span>Allowed Cities</span>
+            </div>
+            <div style="display: flex; align-items: center; margin: 5px 0;">
+              <div style="width: 20px; height: 20px; background: #ef4444; opacity: 0.2; margin-right: 5px;"></div>
+              <span>Restricted Areas</span>
+            </div>
+          </div>
+        `;
+        return div;
+      };
+      legend.addTo(map);
     }
   });
 
