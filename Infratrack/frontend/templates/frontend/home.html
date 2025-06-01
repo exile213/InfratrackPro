@@ -24,26 +24,12 @@
           const allowedLayer = L.geoJSON(geojsonData, {
             style: {
               color: '#16a34a',
-              fillColor: '#4ade80',
-              fillOpacity: 0.3,
-              weight: 3,
-              dashArray: '5, 5'
+              fillColor: '#16a34a',
+              fillOpacity: 0.1,
+              weight: 0.5,
+              dashArray: ''
             }
           }).addTo(map);
-
-          // Add city name labels
-          allowedLayer.eachLayer(function (layer) {
-            if (layer.feature && layer.feature.properties && layer.feature.properties.MUNICIPALI) {
-              const center = layer.getBounds().getCenter();
-              L.marker(center, {
-                icon: L.divIcon({
-                  className: 'city-label',
-                  html: `<div style=\"background: white; padding: 5px; border-radius: 3px; font-weight: bold; font-size: 12px;\">${layer.feature.properties.MUNICIPALI}</div>`,
-                  iconSize: [120, 20]
-                })
-              }).addTo(map);
-            }
-          });
 
           // Restrict marker placement to inside these polygons
           map.on('click', function (e) {
@@ -126,27 +112,6 @@
               });
           });
         });
-
-      // Add a legend to show allowed areas
-      const legend = L.control({ position: 'bottomright' });
-      legend.onAdd = function (map) {
-        const div = L.DomUtil.create('div', 'info legend');
-        div.innerHTML = `
-          <div style="background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2);">
-            <h4 style="margin: 0 0 5px;">Reporting Areas</h4>
-            <div style="display: flex; align-items: center; margin: 5px 0;">
-              <div style="width: 20px; height: 20px; background: #4ade80; opacity: 0.2; margin-right: 5px;"></div>
-              <span>Allowed Cities</span>
-            </div>
-            <div style="display: flex; align-items: center; margin: 5px 0;">
-              <div style="width: 20px; height: 20px; background: #ef4444; opacity: 0.2; margin-right: 5px;"></div>
-              <span>Restricted Areas</span>
-            </div>
-          </div>
-        `;
-        return div;
-      };
-      legend.addTo(map);
     }
   });
 
@@ -309,7 +274,7 @@
 <div class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 py-16">
   <div class="w-full max-w-4xl mx-auto text-center px-4">
     <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4">
-      Report Infrastructures
+      Report Infrastructures Issues
     </h1>
     <p class="text-indigo-100 text-lg mb-8">
       Help improve our communities by reporting damaged roads, drainage,
@@ -354,7 +319,8 @@
         <!-- Issue Type -->
         <div class="bg-gray-50 py-2 px-6 rounded-xl border border-gray-200">
           <label class="block text-lg font-semibold text-gray-800 mb-3">Type of Infrastructure Issue</label>
-          <select name="issue_type" class="block w-full input-modern" required>
+          <select name="issue_type" class="block w-full py-2 px-3 rounded-2xl border border-gray-300 input-modern"
+            required>
             <option selected disabled>Select issue type...</option>
             <option value="Pothole">Pothole</option>
             <option value="Drainage Blockage">Drainage Blockage</option>
@@ -388,7 +354,15 @@
                 placeholder="Enter location (e.g., Main Street, City)"
                 onkeydown="if(event.keyCode === 13) { event.preventDefault(); searchLocation(); }" />
             </div>
-            <div class="h-64 rounded-xl overflow-hidden border border-gray-300 shadow-inner">
+            <!-- Persistent instruction above the map, outside the map container -->
+            <div id="polygon-instruction"
+              style="background: #fef9c3; color: #92400e; border: 1px solid #fde68a; padding: 12px; border-radius: 8px; margin-bottom: 18px; font-weight: 500; text-align: center; font-size: 16px; max-width: 100%;">
+              Report infrastructure repair <b>only within the highlighted polygon area</b> due to project current
+              limitation.<br>
+              <span style="color: #b91c1c; font-weight: 600;">Please do not abuse the map by clicking too many times
+                or placing multiple pins. Only one report location is allowed per submission.</span>
+            </div>
+            <div class="h-96 rounded-xl overflow-hidden border border-gray-300 shadow-inner">
               <div id="report-map" class="w-full h-full"></div>
             </div>
             <!-- Hidden Location Inputs and Address Display -->
@@ -451,8 +425,8 @@
         <!-- Description -->
         <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
           <label class="block text-lg font-semibold text-gray-800 mb-3">Description</label>
-          <textarea name="description" class="block w-full input-modern bg-white" rows="4"
-            placeholder="Please describe the issue in detail..." required></textarea>
+          <textarea name="description" class="block w-full p-2 rounded-2xl border border-gray-300 input-modern bg-white"
+            rows="4" placeholder="Please describe the issue in detail..." required></textarea>
         </div>
         <!-- Contact Info Notice -->
         <div class="bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl p-5 text-base font-medium">
@@ -626,6 +600,16 @@
     input.value = '';
     preview.src = '#';
     previewContainer.classList.add('hidden');
+  }
+
+  // Add instructions for manual entry fields
+  // Find the manual entry tab and add a note above the fields
+  const manualTab = document.getElementById('manual-tab');
+  if (manualTab && !document.getElementById('manual-instruction')) {
+    const manualInstruction = document.createElement('div');
+    manualInstruction.id = 'manual-instruction';
+    manualInstruction.innerHTML = `<div style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 8px; border-radius: 8px; margin-bottom: 10px; font-size: 15px; text-align: center;">Manual location entry: <b>Street can be omitted if not applicable</b>. Please provide as much detail as possible for Barangay, City, and Province.</div>`;
+    manualTab.insertBefore(manualInstruction, manualTab.firstChild);
   }
 </script>
 {% endblock %}
