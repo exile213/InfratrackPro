@@ -65,9 +65,13 @@
     function fetchAndRenderTypeAnalytics() {
         const start = document.getElementById('filter-start')?.value;
         const end = document.getElementById('filter-end')?.value;
+        const location = document.getElementById('filter-location')?.value;
+        const submitter = document.getElementById('search-submitter')?.value;
         let url = `/api/analytics/issues-by-type/?`;
         if (start) url += `start=${start}&`;
         if (end) url += `end=${end}&`;
+        if (location && location !== 'All Locations') url += `location=${encodeURIComponent(location)}&`;
+        if (submitter) url += `submitter=${encodeURIComponent(submitter)}&`;
         fetch(url)
             .then(res => res.json())
             .then(data => {

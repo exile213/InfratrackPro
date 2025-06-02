@@ -97,6 +97,13 @@
             <span class="flex items-center gap-1 text-gray-400">Tracking ID:
               <span class="font-mono text-gray-600 ml-1">{{ report.tracking_code }}</span>
             </span>
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>Date: {{ report.date|date:'M d, Y' }}</span>
+            </span>
           </div>
         </div>
         <div class="text-sm text-gray-500 flex-shrink-0 mt-3 sm:mt-0">
@@ -108,6 +115,32 @@
         <p class="text-gray-500">No reports found matching your criteria.</p>
       </div>
       {% endfor %}
+    </div>
+    <!-- Pagination Controls -->
+    <div class="mt-8 flex justify-center">
+      <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+        {% if reports.has_previous %}
+        <a href="?{% if selected_issue_type %}issue_type={{ selected_issue_type }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_start_date %}start_date={{ selected_start_date }}&{% endif %}{% if selected_end_date %}end_date={{ selected_end_date }}&{% endif %}page={{ reports.previous_page_number }}"
+          class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+          Previous
+        </a>
+        {% else %}
+        <span
+          class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">Previous</span>
+        {% endif %}
+        <span
+          class="relative inline-flex items-center px-4 py-2 border-t border-b border-gray-300 bg-white text-sm font-medium text-gray-700">Page
+          {{ reports.number }} of {{ reports.paginator.num_pages }}</span>
+        {% if reports.has_next %}
+        <a href="?{% if selected_issue_type %}issue_type={{ selected_issue_type }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_start_date %}start_date={{ selected_start_date }}&{% endif %}{% if selected_end_date %}end_date={{ selected_end_date }}&{% endif %}page={{ reports.next_page_number }}"
+          class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+          Next
+        </a>
+        {% else %}
+        <span
+          class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">Next</span>
+        {% endif %}
+      </nav>
     </div>
   </div>
 </div>

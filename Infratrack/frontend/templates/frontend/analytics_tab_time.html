@@ -51,12 +51,14 @@
     </form>
 </div>
 <!-- Chart Card -->
-<div class="bg-white rounded-2xl shadow-md p-6 mb-6 dark:bg-gray-900">
-    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Issue Reports Over Time</h2>
+<div class="bg-white rounded-2xl shadow-md p-6 mb-6 dark:bg-gray-900" style="max-width: 100vw;">
+    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Issue Reports Over Time (Monthly)</h2>
     <div
-        class="h-80 w-full flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <canvas id="chart-time" class="w-full h-full !important"
-            style="width:100% !important; height:100% !important;"></canvas>
+        class="h-[600px] w-full overflow-x-auto flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div style="min-width:900px; width:100%;">
+            <canvas id="chart-time" class="w-full h-full !important"
+                style="width:900px !important; height:600px !important;"></canvas>
+        </div>
     </div>
 </div>
 <script>
@@ -65,40 +67,35 @@
     function fetchAndRenderAnalytics() {
         const start = document.getElementById('filter-start').value;
         const end = document.getElementById('filter-end').value;
-        const issueType = document.getElementById('filter-issue-type').value;
+        const location = document.getElementById('filter-location').value;
+        const submitter = document.getElementById('search-submitter').value;
+
         // Build query string
         let url = `/api/analytics/reports-over-time/?`;
         if (start) url += `start=${start}&`;
         if (end) url += `end=${end}&`;
-        if (issueType && issueType !== 'All Types') url += `issue_type=${encodeURIComponent(issueType)}&`;
+        if (location && location !== 'All Locations') url += `location=${encodeURIComponent(location)}&`;
+        if (submitter) url += `submitter=${encodeURIComponent(submitter)}&`;
+
         fetch(url)
             .then(res => res.json())
             .then(data => {
-                // Prepare chart data
-                const allDates = new Set();
-                Object.values(data).forEach(typeData => {
-                    Object.keys(typeData).forEach(date => allDates.add(date));
-                });
-                const sortedDates = Array.from(allDates).sort();
-                const datasets = Object.keys(data).map((type, idx) => {
-                    const colorList = ['#6366F1', '#10B981', '#F59E42', '#EF4444', '#3B82F6'];
-                    return {
-                        label: type,
-                        data: sortedDates.map(date => data[type][date] || 0),
-                        borderColor: colorList[idx % colorList.length],
-                        backgroundColor: colorList[idx % colorList.length] + '33',
-                        tension: 0.4,
-                        fill: true
-                    };
-                });
                 // Update Chart.js
                 const ctx = document.getElementById('chart-time').getContext('2d');
                 if (chartTimeInstance) chartTimeInstance.destroy();
+
                 chartTimeInstance = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: sortedDates,
-                        datasets: datasets
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Total Reports',
+                            data: data.datasets[0].data,
+                            borderColor: '#6366F1',
+                            backgroundColor: '#6366F133',
+                            tension: 0.4,
+                            fill: true
+                        }]
                     },
                     options: {
                         responsive: true,
@@ -113,7 +110,9 @@
                         scales: {
                             x: {
                                 ticks: {
-                                    color: window.matchMedia('(prefers-color-scheme: dark)').matches ? '#fff' : '#1e293b'
+                                    color: window.matchMedia('(prefers-color-scheme: dark)').matches ? '#fff' : '#1e293b',
+                                    autoSkip: true,
+                                    maxTicksLimit: 12
                                 },
                                 grid: {
                                     color: window.matchMedia('(prefers-color-scheme: dark)').matches ? '#334155' : '#e5e7eb'
@@ -122,7 +121,10 @@
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    color: window.matchMedia('(prefers-color-scheme: dark)').matches ? '#fff' : '#1e293b'
+                                    color: window.matchMedia('(prefers-color-scheme: dark)').matches ? '#fff' : '#1e293b',
+                                    stepSize: 1,
+                                    autoSkip: true,
+                                    maxTicksLimit: 10
                                 },
                                 grid: {
                                     color: window.matchMedia('(prefers-color-scheme: dark)').matches ? '#334155' : '#e5e7eb'
@@ -131,28 +133,21 @@
                         }
                     }
                 });
-                // Update Table
+
+                // Update Summary Table
                 const tableBody = document.getElementById('analytics-time-table-body');
-                tableBody.innerHTML = '';
-                sortedDates.forEach(date => {
-                    let total = 0;
-                    let typeCounts = {};
-                    let uniqueSubmitters = new Set();
-                    Object.keys(data).forEach(type => {
-                        const count = data[type][date] || 0;
-                        total += count;
-                        typeCounts[type] = count;
-                        // For demo, unique submitters is random (replace with real logic if you have submitter info)
+                if (tableBody) {
+                    tableBody.innerHTML = '';
+                    data.labels.forEach((month, index) => {
+                        const total = data.datasets[0].data[index];
+                        tableBody.innerHTML += `<tr>
+                            <td class="px-4 py-2">${month}</td>
+                            <td class="px-4 py-2">${total}</td>
+                            <td class="px-4 py-2">-</td>
+                            <td class="px-4 py-2">-</td>
+                        </tr>`;
                     });
-                    // Find most common issue type
-                    let mostCommonType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
-                    tableBody.innerHTML += `<tr>
-                    <td class="px-4 py-2">${date}</td>
-                    <td class="px-4 py-2">${total}</td>
-                    <td class="px-4 py-2">${mostCommonType}</td>
-                    <td class="px-4 py-2">-</td>
-                </tr>`;
-                });
+                }
             });
     }
 

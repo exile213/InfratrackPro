@@ -9,12 +9,17 @@ from .models import Users, Report, Agency, IssueType, RoadType, RoadTypeAgencyMa
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import uuid
-from datetime import datetime
+from datetime import datetime, date as dt_date
 from django.views.decorators.http import require_GET
 from django.utils.dateparse import parse_date
-from django.db.models import Count
+from django.db.models import Count, Q
 import requests  # Add this import for Overpass API
 import time
+from django.core.paginator import Paginator
+from django.db.models.functions import TruncMonth, TruncYear
+import os
+import csv
+from django.conf import settings
 
 def home(request):
     """Home page view"""
@@ -94,6 +99,11 @@ def dashboard(request):
         except ValueError:
             pass
     
+    # Paginate reports (5 per page)
+    paginator = Paginator(reports, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     # Get all issue types and statuses for the filter dropdowns
     issue_types = IssueType.objects.all()
     statuses = Report.objects.values_list('status_report_status', flat=True).distinct()
@@ -101,7 +111,7 @@ def dashboard(request):
     context = {
         'user': user,
         'role': request.session['role'],
-        'reports': reports,
+        'reports': page_obj,  # Use paginated object
         'issue_types': issue_types,
         'statuses': statuses,
         'selected_issue_type': issue_type,
@@ -363,6 +373,16 @@ def submit_report(request):
                 print(f"Error accessing database: {str(e)}")
                 return JsonResponse({'error': 'Database error'}, status=500)
 
+            # Use submitted date or default to today
+            submitted_date = request.POST.get('date')
+            if submitted_date:
+                try:
+                    report_date = datetime.strptime(submitted_date, '%Y-%m-%d').date()
+                except Exception:
+                    report_date = dt_date.today()
+            else:
+                report_date = dt_date.today()
+
             # Create the report
             try:
                 report = Report.objects.create(
@@ -378,7 +398,8 @@ def submit_report(request):
                     citizen_name=request.POST.get('full_name'),
                     citizen_email=request.POST.get('email'),
                     issue_type=issue_type,
-                    road_type=road_type
+                    road_type=road_type,
+                    date=report_date
                 )
             except Exception as e:
                 print(f"Error creating report: {str(e)}")
@@ -406,41 +427,75 @@ def submit_report(request):
 
 @require_GET
 def analytics_reports_over_time(request):
-    start = request.GET.get('start')
-    end = request.GET.get('end')
-    issue_type = request.GET.get('issue_type')
+    start = request.GET.get('start', '2020-01-01')  # Default to 2020
+    end = request.GET.get('end', '2024-12-31')  # Default to 2024
+    location = request.GET.get('location')
+    submitter = request.GET.get('submitter')
+    
     qs = Report.objects.all()
+    
+    # Apply date filters
     if start:
-        qs = qs.filter(created_at__date__gte=parse_date(start))
+        qs = qs.filter(date__gte=parse_date(start))
     if end:
-        qs = qs.filter(created_at__date__lte=parse_date(end))
-    if issue_type and issue_type != 'All Types':
-        qs = qs.filter(issue_type__name=issue_type)
-    # Group by date and issue type
+        qs = qs.filter(date__lte=parse_date(end))
+    
+    # Apply location filter
+    if location and location != 'All Locations':
+        qs = qs.filter(
+            Q(address__icontains=location) |
+            Q(city__icontains=location) |
+            Q(barangay__icontains=location)
+        )
+    
+    # Apply submitter filter
+    if submitter:
+        qs = qs.filter(
+            Q(citizen_name__icontains=submitter) |
+            Q(citizen_email__icontains=submitter)
+        )
+    
+    # Group by month and get total count
     data = (
-        qs.values('created_at__date', 'issue_type__name')
-        .annotate(count=Count('id'))
-        .order_by('created_at__date')
+        qs.annotate(month=TruncMonth('date'))
+          .values('month')
+          .annotate(count=Count('id'))
+          .order_by('month')
     )
+    
     # Format for Chart.js
-    result = {}
-    for row in data:
-        date = str(row['created_at__date'])
-        typ = row['issue_type__name']
-        if typ not in result:
-            result[typ] = {}
-        result[typ][date] = row['count']
+    result = {
+        'labels': [item['month'].strftime('%B %Y') for item in data],
+        'datasets': [{
+            'label': 'Total Reports',
+            'data': [item['count'] for item in data]
+        }]
+    }
+    
     return JsonResponse(result)
 
 @require_GET
 def analytics_issues_by_type(request):
     start = request.GET.get('start')
     end = request.GET.get('end')
+    location = request.GET.get('location')
+    submitter = request.GET.get('submitter')
     qs = Report.objects.all()
     if start:
-        qs = qs.filter(created_at__date__gte=parse_date(start))
+        qs = qs.filter(date__gte=parse_date(start))
     if end:
-        qs = qs.filter(created_at__date__lte=parse_date(end))
+        qs = qs.filter(date__lte=parse_date(end))
+    if location and location != 'All Locations':
+        qs = qs.filter(
+            Q(address__icontains=location) |
+            Q(city__icontains=location) |
+            Q(barangay__icontains=location)
+        )
+    if submitter:
+        qs = qs.filter(
+            Q(citizen_name__icontains=submitter) |
+            Q(citizen_email__icontains=submitter)
+        )
     data = (
         qs.values('issue_type__name')
         .annotate(count=Count('id'))
@@ -451,17 +506,190 @@ def analytics_issues_by_type(request):
 
 @require_GET
 def analytics_issues_by_location(request):
-    start = request.GET.get('start')
-    end = request.GET.get('end')
-    qs = Report.objects.all()
-    if start:
-        qs = qs.filter(created_at__date__gte=parse_date(start))
-    if end:
-        qs = qs.filter(created_at__date__lte=parse_date(end))
-    data = (
-        qs.values('address')
-        .annotate(count=Count('id'))
-        .order_by('address')
-    )
-    result = {row['address']: row['count'] for row in data}
-    return JsonResponse(result)
+    try:
+        # Get filter parameters
+        start = request.GET.get('start')
+        end = request.GET.get('end')
+        issue_type = request.GET.get('issue_type')
+        location = request.GET.get('location')
+        submitter = request.GET.get('submitter')
+        
+        # Initialize query with basic filtering
+        qs = Report.objects.all()
+        
+        # Add date filters with error handling
+        try:
+            if start:
+                start_date = parse_date(start)
+                if start_date:
+                    qs = qs.filter(date__gte=start_date)
+            if end:
+                end_date = parse_date(end)
+                if end_date:
+                    qs = qs.filter(date__lte=end_date)
+        except Exception as e:
+            print(f"Error parsing dates: {str(e)}")
+            return JsonResponse({
+                'error': 'Invalid date format',
+                'details': str(e)
+            }, status=400)
+        
+        # Add other filters
+        if issue_type and issue_type != 'All Types':
+            qs = qs.filter(issue_type__name=issue_type)
+        if location and location != 'All Locations':
+            qs = qs.filter(address__icontains=location)
+        if submitter:
+            qs = qs.filter(
+                Q(citizen_name__icontains=submitter) |
+                Q(citizen_email__icontains=submitter)
+            )
+        
+        # Debug print
+        print(f"Query SQL: {qs.query}")
+        
+        # Group by address and get total count
+        try:
+            data = (
+                qs.exclude(address__isnull=True)  # Exclude null addresses
+                .values('address')
+                .annotate(count=Count('id'))
+                .order_by('-count')  # Order by count in descending order
+            )
+            
+            # Debug print
+            print(f"Number of results: {len(data)}")
+            
+            # Format for Chart.js
+            result = {}
+            for row in data:
+                if row['address']:  # Only process if address is not None
+                    # Extract city from address (assuming format includes city)
+                    address_parts = row['address'].split(',')
+                    city = address_parts[-2].strip() if len(address_parts) > 1 else row['address'].strip()
+                    
+                    if city not in result:
+                        result[city] = row['count']
+                    else:
+                        result[city] += row['count']
+            
+            # If no results, return empty data instead of error
+            if not result:
+                return JsonResponse({
+                    'labels': [],
+                    'datasets': [{
+                        'label': 'Total Reports',
+                        'data': []
+                    }]
+                })
+            
+            return JsonResponse(result)
+            
+        except Exception as e:
+            print(f"Error in data aggregation: {str(e)}")
+            return JsonResponse({
+                'error': 'Error processing data',
+                'details': str(e)
+            }, status=500)
+            
+    except Exception as e:
+        print(f"Unexpected error in analytics_issues_by_location: {str(e)}")
+        return JsonResponse({
+            'error': 'An unexpected error occurred',
+            'details': str(e)
+        }, status=500)
+
+@require_GET
+def get_report_data(request):
+    try:
+        # Get date range from request
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        
+        # Convert to datetime objects
+        if start_date:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        if end_date:
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        
+        # Get reports within date range
+        reports = Report.objects.all()
+        if start_date:
+            reports = reports.filter(date__gte=start_date)
+        if end_date:
+            reports = reports.filter(date__lte=end_date)
+        
+        # Get total reports per month
+        monthly_data = reports.annotate(
+            month=TruncMonth('date')
+        ).values('month').annotate(
+            total=Count('id')
+        ).order_by('month')
+        
+        # Format data for chart
+        months = [item['month'].strftime('%B %Y') for item in monthly_data]
+        totals = [item['total'] for item in monthly_data]
+        
+        return JsonResponse({
+            'months': months,
+            'totals': totals
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+def seed_issue_types():
+    # Delete existing issue types
+    IssueType.objects.all().delete()
+    
+    # Define issue types to match CSV data
+    issue_types = [
+        'Pothole',
+        'Drainage Blockage',
+        'Faded Markings',
+        'Broken Signage'
+    ]
+    
+    # Seed issue types
+    for issue_type in issue_types:
+        IssueType.objects.create(name=issue_type)
+    
+    print("Issue types seeded successfully.")
+
+def seed_reports():
+    # Delete existing reports
+    Report.objects.all().delete()
+    
+    # Seed issue types and road types if not already done
+    seed_issue_types()
+    seed_road_types()
+    
+    # Read CSV data
+    csv_file_path = os.path.join(settings.BASE_DIR, 'infrastructure_reports_negros_occidental.csv')
+    with open(csv_file_path, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            # Get or create issue type
+            issue_type, _ = IssueType.objects.get_or_create(name=row['issue_type'])
+            
+            # Get or create road type
+            road_type, _ = RoadType.objects.get_or_create(name=row['road_type'])
+            
+            # Create report
+            Report.objects.create(
+                tracking_code=row['tracking_code'],
+                description=row['description'],
+                photo_url=row['photo_url'],
+                latitude=row['latitude'],
+                longitude=row['longitude'],
+                address=row['address'],
+                road_name=row['road_name'],
+                assigned_agency=Agency.objects.first(),  # Default agency
+                status_report_status='Pending',
+                citizen_name=row['citizen_name'],
+                citizen_email=row['citizen_email'],
+                issue_type=issue_type,
+                road_type=road_type,
+                date=datetime.strptime(row['date'], '%Y-%m-%d').date()
+            )
+    
+    print("Reports seeded successfully.")

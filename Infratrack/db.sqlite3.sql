@@ -140,6 +140,16 @@ CREATE TABLE IF NOT EXISTS "frontend_roadtype" (
 	"created_at"	datetime NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
+CREATE TABLE IF NOT EXISTS "frontend_roadtypeagencymapping" (
+	"id"	integer NOT NULL,
+	"jurisdiction_type"	varchar(50) NOT NULL,
+	"created_at"	datetime NOT NULL,
+	"agency_id"	bigint NOT NULL,
+	"road_type_id"	bigint NOT NULL,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("agency_id") REFERENCES "frontend_agency"("id") DEFERRABLE INITIALLY DEFERRED,
+	FOREIGN KEY("road_type_id") REFERENCES "frontend_roadtype"("id") DEFERRABLE INITIALLY DEFERRED
+);
 CREATE TABLE IF NOT EXISTS "frontend_role" (
 	"id"	integer NOT NULL,
 	"name"	varchar(100) NOT NULL,
@@ -216,7 +226,18 @@ INSERT INTO "auth_permission" VALUES (53,13,'add_users','Can add users');
 INSERT INTO "auth_permission" VALUES (54,13,'change_users','Can change users');
 INSERT INTO "auth_permission" VALUES (55,13,'delete_users','Can delete users');
 INSERT INTO "auth_permission" VALUES (56,13,'view_users','Can view users');
-INSERT INTO "auth_user" VALUES (1,'pbkdf2_sha256$1000000$DwAZsuK46CI4Av3HMiOwSH$UBDdUBkVrFReQd0ynNHLeI9CrbLpUgz0d1pXi+QRoeU=','2025-05-31 04:51:29.505147',1,'admin','','runeskater27@gmail.com',1,1,'2025-05-31 04:39:55.439659','');
+INSERT INTO "auth_permission" VALUES (57,14,'add_roadtypeagencymapping','Can add road type agency mapping');
+INSERT INTO "auth_permission" VALUES (58,14,'change_roadtypeagencymapping','Can change road type agency mapping');
+INSERT INTO "auth_permission" VALUES (59,14,'delete_roadtypeagencymapping','Can delete road type agency mapping');
+INSERT INTO "auth_permission" VALUES (60,14,'view_roadtypeagencymapping','Can view road type agency mapping');
+INSERT INTO "auth_user" VALUES (1,'pbkdf2_sha256$1000000$DwAZsuK46CI4Av3HMiOwSH$UBDdUBkVrFReQd0ynNHLeI9CrbLpUgz0d1pXi+QRoeU=','2025-06-01 16:12:21.770386',1,'admin','','runeskater27@gmail.com',1,1,'2025-05-31 04:39:55.439659','');
+INSERT INTO "django_admin_log" VALUES (1,'1','dpwh_john',3,'',13,1,'2025-06-01 08:37:55.223106');
+INSERT INTO "django_admin_log" VALUES (2,'2','ceo_maria',3,'',13,1,'2025-06-01 08:37:58.943577');
+INSERT INTO "django_admin_log" VALUES (3,'3','dpwh',3,'',13,1,'2025-06-01 08:38:03.466548');
+INSERT INTO "django_admin_log" VALUES (4,'4','city_engineering_office',3,'',13,1,'2025-06-01 08:38:06.428261');
+INSERT INTO "django_admin_log" VALUES (5,'3','DPWH',3,'',7,1,'2025-06-01 09:06:20.206919');
+INSERT INTO "django_admin_log" VALUES (6,'4','City Engineering Office',3,'',7,1,'2025-06-01 09:06:24.027303');
+INSERT INTO "django_admin_log" VALUES (7,'16','REP-20250602-42d9bbcb - Pothole',2,'[{"changed": {"fields": ["Description", "Assigned agency", "Road type"]}}]',12,1,'2025-06-01 16:12:51.170717');
 INSERT INTO "django_content_type" VALUES (1,'admin','logentry');
 INSERT INTO "django_content_type" VALUES (2,'auth','permission');
 INSERT INTO "django_content_type" VALUES (3,'auth','group');
@@ -230,6 +251,7 @@ INSERT INTO "django_content_type" VALUES (10,'frontend','role');
 INSERT INTO "django_content_type" VALUES (11,'frontend','infrastructuremap');
 INSERT INTO "django_content_type" VALUES (12,'frontend','report');
 INSERT INTO "django_content_type" VALUES (13,'frontend','users');
+INSERT INTO "django_content_type" VALUES (14,'frontend','roadtypeagencymapping');
 INSERT INTO "django_migrations" VALUES (1,'contenttypes','0001_initial','2025-05-30 23:55:55.565096');
 INSERT INTO "django_migrations" VALUES (2,'auth','0001_initial','2025-05-30 23:55:55.631947');
 INSERT INTO "django_migrations" VALUES (3,'admin','0001_initial','2025-05-30 23:55:55.690337');
@@ -250,31 +272,118 @@ INSERT INTO "django_migrations" VALUES (17,'auth','0012_alter_user_first_name_ma
 INSERT INTO "django_migrations" VALUES (18,'frontend','0001_initial','2025-05-30 23:55:56.321873');
 INSERT INTO "django_migrations" VALUES (19,'sessions','0001_initial','2025-05-30 23:55:56.356930');
 INSERT INTO "django_migrations" VALUES (20,'frontend','0002_rename_user_users','2025-05-31 16:41:10.000590');
-INSERT INTO "django_session" VALUES ('zqlp47ai63l4vu1l87709os8ew3atzci','.eJxVjssKwjAQRX9FspaQSWlD3OnelR8QJsmkadVE-kBE_HcbLKK74d5zD_NkBucpmnmkwXSe7Riw7W9m0Z0plcL3mNrMXU7T0FleEL62Iz9mT5fDyv4JIo6xrCsnBAgVPFagAoGVrvEigELSWiNIZZX05ANoV1sJulFaVraWjfKK3CL9_gifO-GVivl2j6bPMS3IkC8l2reU3GNzmjAE9noDfQhK3g:1uLPUz:FOdho8cKVMl-0NMsvD21929RPd70qT7j6cymWEuqq68','2025-06-14 16:55:57.469356');
-INSERT INTO "frontend_agency" VALUES (3,'DPWH','Manila','Metro Manila','dpwh@example.com','123-456-7890','2025-05-31 16:43:06.628501');
-INSERT INTO "frontend_agency" VALUES (4,'City Engineering Office','Manila','Manila City','ceo@example.com','098-765-4321','2025-05-31 16:43:06.632498');
+INSERT INTO "django_migrations" VALUES (21,'frontend','0003_roadtypeagencymapping','2025-06-01 14:56:24.493264');
+INSERT INTO "django_session" VALUES ('c478iha53t7kqkm4uhibzmkrc6mh0717','.eJxVjEEOwiAQRe_C2hAGUia4dO8ZyMAMUjUlKe2q8e6GpAvd_vfeP1Skfatx77LGmdVVgbr8bonyS5YB-EnLo-nclm2dkx6KPmnX98byvp3u30GlXkftsjFgsDA5wCKQbPZsCiBJCIHAYkLLwgVCnpKF4DFYlybrkVGy-nwB7Dc3_g:1uLlIL:4r9R_UCu_u_e6fvREz6j9kkViQnj_j6BatNTWD6xhD4','2025-06-15 16:12:21.776386');
+INSERT INTO "frontend_agency" VALUES (5,'DPWH District 1','','National Roads District 1','dpwh1@gmail.com','1234567890','2025-06-01 08:16:12.229486');
+INSERT INTO "frontend_agency" VALUES (6,'DPWH District 5','','National Roads District 5','dpwh5@gmail.com','1234567891','2025-06-01 08:16:12.236021');
+INSERT INTO "frontend_agency" VALUES (7,'City Engineer of Victorias','Victorias','Victorias City','victorias.engineer@gmail.com','1234567892','2025-06-01 08:16:12.239021');
+INSERT INTO "frontend_agency" VALUES (8,'City Engineer of Silay','Silay','Silay City','silay.engineer@gmail.com','1234567893','2025-06-01 08:16:12.241533');
+INSERT INTO "frontend_agency" VALUES (9,'City Engineer of Talisay','Talisay','Talisay City','talisay.engineer@gmail.com','1234567894','2025-06-01 08:16:12.246047');
+INSERT INTO "frontend_agency" VALUES (10,'City Engineer of Bacolod','Bacolod','Bacolod City','bacolod.engineer@gmail.com','1234567895','2025-06-01 08:16:12.248045');
 INSERT INTO "frontend_issuetype" VALUES (5,'Pothole','Description for Pothole','2025-05-31 16:43:06.637106');
 INSERT INTO "frontend_issuetype" VALUES (6,'Drainage Blockage','Description for Drainage Blockage','2025-05-31 16:43:06.640897');
 INSERT INTO "frontend_issuetype" VALUES (7,'Faded Markings','Description for Faded Markings','2025-05-31 16:43:06.643902');
 INSERT INTO "frontend_issuetype" VALUES (8,'Broken Signage','Description for Broken Signage','2025-05-31 16:43:06.646875');
-INSERT INTO "frontend_report" VALUES (1,'TRK2846','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Zone 4','Narra St.','resolved','Test Citizen','citizen@example.com','2025-05-31 16:43:06.675775','2025-05-31 16:43:06.675775',4,5,5);
-INSERT INTO "frontend_report" VALUES (2,'TRK2182','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Main Ave','Brgy. San Jose','pending','Test Citizen','citizen@example.com','2025-05-31 16:43:06.681786','2025-05-31 16:43:06.681786',4,5,6);
-INSERT INTO "frontend_report" VALUES (3,'TRK9574','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Narra St.','Zone 4','in_progress','Test Citizen','citizen@example.com','2025-05-31 16:43:06.686301','2025-05-31 16:43:06.686301',3,7,5);
-INSERT INTO "frontend_report" VALUES (4,'TRK1259','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Brgy. San Jose','Narra St.','resolved','Test Citizen','citizen@example.com','2025-05-31 16:43:06.690300','2025-05-31 16:43:06.690300',3,5,5);
-INSERT INTO "frontend_report" VALUES (5,'TRK4276','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Zone 4','Narra St.','in_progress','Test Citizen','citizen@example.com','2025-05-31 16:43:06.693300','2025-05-31 16:43:06.693300',3,5,4);
-INSERT INTO "frontend_report" VALUES (6,'TRK9377','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Narra St.','Main Ave','resolved','Test Citizen','citizen@example.com','2025-05-31 16:43:06.698816','2025-05-31 16:43:06.698816',3,8,4);
-INSERT INTO "frontend_report" VALUES (7,'TRK9788','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Zone 4','Narra St.','resolved','Test Citizen','citizen@example.com','2025-05-31 16:43:06.702812','2025-05-31 16:43:06.702812',3,7,6);
-INSERT INTO "frontend_report" VALUES (8,'TRK8925','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Pine Rd.','Zone 4','pending','Test Citizen','citizen@example.com','2025-05-31 16:43:06.707864','2025-05-31 16:43:06.707864',4,7,4);
-INSERT INTO "frontend_report" VALUES (9,'TRK7221','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Pine Rd.','Pine Rd.','resolved','Test Citizen','citizen@example.com','2025-05-31 16:43:06.711844','2025-05-31 16:43:06.711844',3,5,5);
-INSERT INTO "frontend_report" VALUES (10,'TRK7353','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Main Ave','Narra St.','pending','Test Citizen','citizen@example.com','2025-05-31 16:43:06.715347','2025-05-31 16:43:06.715347',4,6,6);
+INSERT INTO "frontend_report" VALUES (1,'TRK2846','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Zone 4','Narra St.','resolved','Test Citizen','citizen@example.com','2025-05-31 16:43:06.675775','2025-05-31 16:43:06.675775',5,5,5);
+INSERT INTO "frontend_report" VALUES (2,'TRK2182','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Main Ave','Brgy. San Jose','pending','Test Citizen','citizen@example.com','2025-05-31 16:43:06.681786','2025-05-31 16:43:06.681786',5,5,6);
+INSERT INTO "frontend_report" VALUES (3,'TRK9574','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Narra St.','Zone 4','in_progress','Test Citizen','citizen@example.com','2025-05-31 16:43:06.686301','2025-05-31 16:43:06.686301',5,7,5);
+INSERT INTO "frontend_report" VALUES (4,'TRK1259','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Brgy. San Jose','Narra St.','resolved','Test Citizen','citizen@example.com','2025-05-31 16:43:06.690300','2025-05-31 16:43:06.690300',5,5,5);
+INSERT INTO "frontend_report" VALUES (5,'TRK4276','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Zone 4','Narra St.','in_progress','Test Citizen','citizen@example.com','2025-05-31 16:43:06.693300','2025-05-31 16:43:06.693300',5,5,4);
+INSERT INTO "frontend_report" VALUES (6,'TRK9377','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Narra St.','Main Ave','resolved','Test Citizen','citizen@example.com','2025-05-31 16:43:06.698816','2025-05-31 16:43:06.698816',5,8,4);
+INSERT INTO "frontend_report" VALUES (7,'TRK9788','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Zone 4','Narra St.','resolved','Test Citizen','citizen@example.com','2025-05-31 16:43:06.702812','2025-05-31 16:43:06.702812',5,7,6);
+INSERT INTO "frontend_report" VALUES (8,'TRK8925','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Pine Rd.','Zone 4','pending','Test Citizen','citizen@example.com','2025-05-31 16:43:06.707864','2025-05-31 16:43:06.707864',5,7,4);
+INSERT INTO "frontend_report" VALUES (9,'TRK7221','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Pine Rd.','Pine Rd.','resolved','Test Citizen','citizen@example.com','2025-05-31 16:43:06.711844','2025-05-31 16:43:06.711844',5,5,5);
+INSERT INTO "frontend_report" VALUES (10,'TRK7353','This is a test report generated by seed script.','https://example.com/test-photo.jpg',14.5995,120.9842,'Main Ave','Narra St.','pending','Test Citizen','citizen@example.com','2025-05-31 16:43:06.715347','2025-05-31 16:43:06.715347',5,6,6);
+INSERT INTO "frontend_report" VALUES (11,'REP-20250601-5d1bd5ac','pothole','/media/reports/REP-20250601-5d1bd5ac_Screenshot%202024-09-06%20174956.png',10.7184128,122.9717504,'Don Mariano Lacson Highway, Zone 15, Talisay, Negros Occidental','Don Mariano Lacson Highway','Pending','Emil Joaquin Diaz','diaz@gmail.com','2025-05-31 17:32:42.351558','2025-05-31 17:32:42.351558',5,5,5);
+INSERT INTO "frontend_report" VALUES (12,'REP-20250601-1935ee1f','pothole','/media/reports/REP-20250601-1935ee1f_Screenshot%202024-09-06%20174956.png',10.7184128,122.9717504,'Don Mariano Lacson Highway, Zone 15, Talisay, Negros Occidental','Don Mariano Lacson Highway','Pending','Emil Joaquin Diaz','diaz@gmail.com','2025-05-31 17:32:42.528530','2025-05-31 17:32:42.528530',5,5,5);
+INSERT INTO "frontend_report" VALUES (13,'REP-20250601-abd88dc8','pothole for city engineer ','/media/reports/REP-20250601-abd88dc8_Screenshot%202024-09-13%20232541.png',10.7949253192445,122.981166243553,'Doctor Triño Montinola Street, Barangay IV, Silay, Negros Occidental','Doctor Triño Montinola Street','Pending','EMIL JOAQUIN HINOLAN','diaz@gmail.com','2025-06-01 15:25:00.999621','2025-06-01 15:25:00.999621',8,5,11);
+INSERT INTO "frontend_report" VALUES (14,'REP-20250601-bf94ea8d','pothole for city engineer ','/media/reports/REP-20250601-bf94ea8d_Screenshot%202024-09-13%20232541.png',10.7949253192445,122.981166243553,'Doctor Triño Montinola Street, Barangay IV, Silay, Negros Occidental','Doctor Triño Montinola Street','Pending','EMIL JOAQUIN HINOLAN','diaz@gmail.com','2025-06-01 15:25:03.438280','2025-06-01 15:25:03.438280',8,5,11);
+INSERT INTO "frontend_report" VALUES (15,'REP-20250601-f5236de5','pothole in main road of victorias','/media/reports/REP-20250601-f5236de5_Screenshot%202024-09-13%20231841.png',10.9005072552478,123.069743514061,'Osmeña Avenue, , Victorias, Negros Occidental','Osmeña Avenue','Pending','EMIL JOAQUIN HINOLAN','diaz@gmail.com','2025-06-01 15:49:47.493387','2025-06-01 15:49:47.493387',7,6,12);
+INSERT INTO "frontend_report" VALUES (16,'REP-20250602-42d9bbcb','pothole silay','/media/reports/REP-20250602-42d9bbcb_Blippar-Workspace.png',10.8025074,122.9775394,'Rizal Street, Barangay II, Silay, Negros Occidental','Antonio Luna Street','Pending','Emil Diaz','diaz@gmail.com','2025-06-01 16:10:31.319193','2025-06-01 16:12:51.164722',5,5,9);
+INSERT INTO "frontend_report" VALUES (17,'REP-20250602-bdbe62e1','pothole there ','/media/reports/REP-20250602-bdbe62e1_Screenshot%202024-11-04%20101631.png',10.897810052852,123.066283464432,'Osmeña Avenue, , Victorias, Negros Occidental','Osmeña Avenue','Pending','Emil Joaquin Diaz','diaz@gmail.com','2025-06-01 16:38:45.491506','2025-06-01 16:38:45.491506',5,5,9);
 INSERT INTO "frontend_roadtype" VALUES (4,'Concrete','Description for Concrete road','2025-05-31 16:43:06.650870');
 INSERT INTO "frontend_roadtype" VALUES (5,'Asphalt','Description for Asphalt road','2025-05-31 16:43:06.656388');
 INSERT INTO "frontend_roadtype" VALUES (6,'Gravel','Description for Gravel road','2025-05-31 16:43:06.660377');
+INSERT INTO "frontend_roadtype" VALUES (7,'motorway','Major highways, expressways, and freeways','2025-06-01 14:56:37.885866');
+INSERT INTO "frontend_roadtype" VALUES (8,'trunk','Major roads, often connecting cities','2025-06-01 14:56:37.893925');
+INSERT INTO "frontend_roadtype" VALUES (9,'primary','Primary roads, major arterial routes','2025-06-01 14:56:37.899141');
+INSERT INTO "frontend_roadtype" VALUES (10,'secondary','Secondary roads, connecting primary roads','2025-06-01 14:56:37.905657');
+INSERT INTO "frontend_roadtype" VALUES (11,'tertiary','Tertiary roads, connecting secondary roads','2025-06-01 14:56:37.915719');
+INSERT INTO "frontend_roadtype" VALUES (12,'residential','Residential streets and local roads','2025-06-01 14:56:37.928287');
+INSERT INTO "frontend_roadtype" VALUES (13,'service','Service roads, access roads','2025-06-01 14:56:37.937948');
+INSERT INTO "frontend_roadtype" VALUES (14,'unclassified','Unclassified roads','2025-06-01 14:56:37.949522');
+INSERT INTO "frontend_roadtype" VALUES (15,'living_street','Living streets, pedestrian priority','2025-06-01 14:56:37.959592');
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (1,'national','2025-06-01 14:56:39.023653',5,4);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (2,'national','2025-06-01 14:56:39.023653',5,5);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (3,'national','2025-06-01 14:56:39.023653',5,6);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (4,'national','2025-06-01 14:56:39.023653',5,7);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (5,'national','2025-06-01 14:56:39.023653',5,8);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (6,'national','2025-06-01 14:56:39.023653',5,9);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (7,'national','2025-06-01 14:56:39.023653',5,10);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (8,'national','2025-06-01 14:56:39.023653',5,11);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (9,'national','2025-06-01 14:56:39.023653',5,12);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (10,'national','2025-06-01 14:56:39.023653',5,13);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (11,'national','2025-06-01 14:56:39.023653',5,14);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (12,'national','2025-06-01 14:56:39.023653',5,15);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (13,'city','2025-06-01 14:56:39.023653',7,4);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (14,'city','2025-06-01 14:56:39.023653',7,5);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (15,'city','2025-06-01 14:56:39.023653',7,6);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (16,'city','2025-06-01 14:56:39.023653',7,7);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (17,'city','2025-06-01 14:56:39.023653',7,8);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (18,'city','2025-06-01 14:56:39.023653',7,9);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (19,'city','2025-06-01 14:56:39.023653',7,10);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (20,'city','2025-06-01 14:56:39.023653',7,11);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (21,'city','2025-06-01 14:56:39.023653',7,12);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (22,'city','2025-06-01 14:56:39.023653',7,13);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (23,'city','2025-06-01 14:56:39.023653',7,14);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (24,'city','2025-06-01 14:56:39.023653',7,15);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (25,'city','2025-06-01 14:56:39.023653',8,4);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (26,'city','2025-06-01 14:56:39.023653',8,5);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (27,'city','2025-06-01 14:56:39.023653',8,6);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (28,'city','2025-06-01 14:56:39.023653',8,7);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (29,'city','2025-06-01 14:56:39.023653',8,8);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (30,'city','2025-06-01 14:56:39.023653',8,9);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (31,'city','2025-06-01 14:56:39.023653',8,10);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (32,'city','2025-06-01 14:56:39.023653',8,11);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (33,'city','2025-06-01 14:56:39.023653',8,12);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (34,'city','2025-06-01 14:56:39.023653',8,13);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (35,'city','2025-06-01 14:56:39.023653',8,14);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (36,'city','2025-06-01 14:56:39.023653',8,15);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (37,'city','2025-06-01 14:56:39.023653',9,4);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (38,'city','2025-06-01 14:56:39.023653',9,5);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (39,'city','2025-06-01 14:56:39.023653',9,6);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (40,'city','2025-06-01 14:56:39.023653',9,7);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (41,'city','2025-06-01 14:56:39.023653',9,8);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (42,'city','2025-06-01 14:56:39.023653',9,9);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (43,'city','2025-06-01 14:56:39.023653',9,10);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (44,'city','2025-06-01 14:56:39.023653',9,11);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (45,'city','2025-06-01 14:56:39.023653',9,12);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (46,'city','2025-06-01 14:56:39.023653',9,13);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (47,'city','2025-06-01 14:56:39.023653',9,14);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (48,'city','2025-06-01 14:56:39.023653',9,15);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (49,'city','2025-06-01 14:56:39.023653',10,4);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (50,'city','2025-06-01 14:56:39.023653',10,5);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (51,'city','2025-06-01 14:56:39.023653',10,6);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (52,'city','2025-06-01 14:56:39.023653',10,7);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (53,'city','2025-06-01 14:56:39.023653',10,8);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (54,'city','2025-06-01 14:56:39.023653',10,9);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (55,'city','2025-06-01 14:56:39.023653',10,10);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (56,'city','2025-06-01 14:56:39.023653',10,11);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (57,'city','2025-06-01 14:56:39.023653',10,12);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (58,'city','2025-06-01 14:56:39.023653',10,13);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (59,'city','2025-06-01 14:56:39.023653',10,14);
+INSERT INTO "frontend_roadtypeagencymapping" VALUES (60,'city','2025-06-01 14:56:39.023653',10,15);
 INSERT INTO "frontend_role" VALUES (4,'Admin');
 INSERT INTO "frontend_role" VALUES (5,'Agency Staff');
 INSERT INTO "frontend_role" VALUES (6,'Citizen');
-INSERT INTO "frontend_users" VALUES (1,'dpwh_john','john@dpwh.gov.ph','password123','John Doe',1,'2025-05-31 16:43:06.663376',NULL,3,5);
-INSERT INTO "frontend_users" VALUES (2,'ceo_maria','maria@ceo.gov.ph','password123','Maria Santos',1,'2025-05-31 16:43:06.669895',NULL,4,5);
+INSERT INTO "frontend_role" VALUES (7,'Agency Admin');
+INSERT INTO "frontend_users" VALUES (5,'dpwh_district_1','dpwh1@gmail.com','defaultpassword123','DPWH District 1',1,'2025-06-01 08:23:26.907165',NULL,5,7);
+INSERT INTO "frontend_users" VALUES (6,'dpwh_district_5','dpwh5@gmail.com
+','pbkdf2_sha256$1000000$eTbMfie5MLH1qmHRJBS2A8$5CU2liNxGiJTnBBQXGhvNM+c/Isf1IbdNKtjGbVgNeU=','DPWH District 5',1,'2025-06-01 08:23:27.274907',NULL,6,7);
+INSERT INTO "frontend_users" VALUES (7,'city_engineer_of_victorias','victorias.engineer@gmail.com','pbkdf2_sha256$1000000$sSOxhyLqbLvfbPx3LJ2kmZ$WPudoCfJXuZXucxWNkv4c7Xu7MfsHCr7nuAlHeO9K3A=','City Engineer of Victorias',1,'2025-06-01 08:23:27.640587',NULL,7,7);
+INSERT INTO "frontend_users" VALUES (8,'city_engineer_of_silay','silay.engineer@gmail.com','pbkdf2_sha256$1000000$5E8UZV38MhjxZTg8DOjy13$K7VRFe9ttmMHZLm9nkhxyHZGVtz0K/vUc4Fj6wm2zZE=','City Engineer of Silay',1,'2025-06-01 08:23:28.003664',NULL,8,7);
+INSERT INTO "frontend_users" VALUES (9,'city_engineer_of_talisay','talisay.engineer@gmail.com','pbkdf2_sha256$1000000$znp092CBmBou3ooYdNZUSX$/gGLWWXc6Uq/PcHDxyi5oTREyBYpHor+HETkcwh31xk=','City Engineer of Talisay',1,'2025-06-01 08:23:28.373588',NULL,9,7);
+INSERT INTO "frontend_users" VALUES (10,'city_engineer_of_bacolod','bacolod.engineer@gmail.com','pbkdf2_sha256$1000000$ZGpEaXi0NvRK0M3aT3v4k4$wjvZ26T576aiCzcstUtlwxX80dyAgWtzMlQJmAR/20g=','City Engineer of Bacolod',1,'2025-06-01 08:23:28.751438',NULL,10,7);
 CREATE INDEX IF NOT EXISTS "auth_group_permissions_group_id_b120cbf9" ON "auth_group_permissions" (
 	"group_id"
 );
@@ -336,6 +445,17 @@ CREATE INDEX IF NOT EXISTS "frontend_report_issue_type_id_e40c7fcd" ON "frontend
 );
 CREATE INDEX IF NOT EXISTS "frontend_report_road_type_id_06577123" ON "frontend_report" (
 	"road_type_id"
+);
+CREATE INDEX IF NOT EXISTS "frontend_roadtypeagencymapping_agency_id_d402f4d3" ON "frontend_roadtypeagencymapping" (
+	"agency_id"
+);
+CREATE INDEX IF NOT EXISTS "frontend_roadtypeagencymapping_road_type_id_4dfa9039" ON "frontend_roadtypeagencymapping" (
+	"road_type_id"
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "frontend_roadtypeagencymapping_road_type_id_agency_id_jurisdiction_type_98e1f18d_uniq" ON "frontend_roadtypeagencymapping" (
+	"road_type_id",
+	"agency_id",
+	"jurisdiction_type"
 );
 CREATE INDEX IF NOT EXISTS "frontend_user_agency_id_a00ce96f" ON "frontend_users" (
 	"agency_id"

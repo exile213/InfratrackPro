@@ -90,10 +90,10 @@ class InfrastructureMap(models.Model):
 class Report(models.Model):
     tracking_code = models.CharField(max_length=100)
     description = models.TextField()
-    photo_url = models.TextField()
-    latitude = models.DecimalField(max_digits=10, decimal_places=7)
-    longitude = models.DecimalField(max_digits=10, decimal_places=7)
-    address = models.TextField()
+    photo_url = models.TextField(null=True, blank=True)
+    latitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
     road_name = models.CharField(max_length=255)
     assigned_agency = models.ForeignKey(Agency, on_delete=models.CASCADE)
     status_report_status = models.CharField(max_length=100)
@@ -101,8 +101,10 @@ class Report(models.Model):
     citizen_email = models.EmailField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(Users, on_delete=models.SET_NULL, null=True, blank=True)
     issue_type = models.ForeignKey(IssueType, on_delete=models.CASCADE)
     road_type = models.ForeignKey(RoadType, on_delete=models.CASCADE)
+    date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.tracking_code} - {self.issue_type.name}"
