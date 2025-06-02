@@ -394,7 +394,7 @@ def submit_report(request):
                     address=request.POST.get('address'),
                     road_name=road_name or request.POST.get('road_name'),
                     assigned_agency=agency,
-                    status_report_status='Pending',
+                    status_report_status='Active',
                     citizen_name=request.POST.get('full_name'),
                     citizen_email=request.POST.get('email'),
                     issue_type=issue_type,
@@ -684,7 +684,7 @@ def seed_reports():
                 address=row['address'],
                 road_name=row['road_name'],
                 assigned_agency=Agency.objects.first(),  # Default agency
-                status_report_status='Pending',
+                status_report_status='Active',
                 citizen_name=row['citizen_name'],
                 citizen_email=row['citizen_email'],
                 issue_type=issue_type,
