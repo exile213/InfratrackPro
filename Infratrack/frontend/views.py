@@ -88,14 +88,14 @@ def dashboard(request):
     if start_date:
         try:
             start_date = datetime.strptime(start_date, '%Y-%m-%d')
-            reports = reports.filter(created_at__gte=start_date)
+            reports = reports.filter(date__gte=start_date)
         except ValueError:
             pass
     
     if end_date:
         try:
             end_date = datetime.strptime(end_date, '%Y-%m-%d')
-            reports = reports.filter(created_at__lte=end_date)
+            reports = reports.filter(date__lte=end_date)
         except ValueError:
             pass
     
